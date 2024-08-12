@@ -8,17 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Generate Health Recommendations
-// @Description Generate Health Recommendations for doctor
-// @Tags HealthCheck
-// @Accept json
-// @Produce json
-// @Param id path string true "user id"
-// @Success 200 {object} models.GetProfileRes
-// @Failure 400 {object} models.Error
-// @Failure 404 {object} models.Error
-// @Failure 500 {object} models.Error
-// @Router /users/getUserProfile/ [get]
+// AddLifeStyleData godoc
+// @Security ApiKeyAuth
+// @Summary Add lifestyle data
+// @Description Adds lifestyle data for a user
+// @Tags Lifestyle
+// @Param id path string true "User ID"
+// @Param body body health.AddLifeStyleDataReq true "Request body for adding lifestyle data"
+// @Success 200 {object} health.AddLifeStyleDataResp "Successful operation"
+// @Failure 400 {object} models.Error "Invalid request parameters"
+// @Failure 500 {object} models.Error "Internal server error"
+// @Router /lifestyle/data/{id} [post]
 func (h *Handler) AddLifeStyleData(ctx *gin.Context) {
 	var life health.AddLifeStyleDataReq
 
@@ -40,17 +40,15 @@ func (h *Handler) AddLifeStyleData(ctx *gin.Context) {
 }
 
 
-// @Summary Generate Health Recommendations
-// @Description Generate Health Recommendations for doctor
-// @Tags HealthCheck
-// @Accept json
-// @Produce json
-// @Param id path string true "user id"
-// @Success 200 {object} models.GetProfileRes
-// @Failure 400 {object} models.Error
-// @Failure 404 {object} models.Error
-// @Failure 500 {object} models.Error
-// @Router /users/getUserProfile/{:user_id} [get]
+// GetLifeStyleData godoc
+// @Security ApiKeyAuth
+// @Summary Get lifestyle data
+// @Description Retrieves lifestyle data for a user
+// @Tags Lifestyle
+// @Param user_id path string true "User ID"
+// @Success 200 {object} health.GetLifeStyleDataResp "Successful operation"
+// @Failure 500 {object} models.Error "Internal server error"
+// @Router /lifestyle/data/{user_id} [get]
 func (h *Handler) GetLifeStyleData(ctx *gin.Context) {
 	id := ctx.Param("user_id")
 
@@ -64,6 +62,15 @@ func (h *Handler) GetLifeStyleData(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
+// GetLifeStyleDataById godoc
+// @Security ApiKeyAuth
+// @Summary Get lifestyle data by ID
+// @Description Retrieves lifestyle data for a specific entry by its ID
+// @Tags Lifestyle
+// @Param id path string true "Data ID"
+// @Success 200 {object} health.GetLifeStyleDataByIdResp "Successful operation"
+// @Failure 500 {object} models.Error "Internal server error"
+// @Router /lifestyle/data/id/{id} [get]
 func (h *Handler) GetLifeStyleDataById(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -77,6 +84,17 @@ func (h *Handler) GetLifeStyleDataById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
+
+// UpdateLifeStyleData godoc
+// @Security ApiKeyAuth
+// @Summary Update lifestyle data
+// @Description Updates a specific lifestyle data entry
+// @Tags Lifestyle
+// @Param body body health.UpdateLifeStyleDataReq true "Request body for updating lifestyle data"
+// @Success 200 {object} health.UpdateLifeStyleDataResp "Successful operation"
+// @Failure 400 {object} models.Error "Invalid request parameters"
+// @Failure 500 {object} models.Error "Internal server error"
+// @Router /lifestyle/data/update [put]
 func (h *Handler) UpdateLifeStyleData(ctx *gin.Context) {
 	var update health.UpdateLifeStyleDataReq
 
@@ -96,6 +114,16 @@ func (h *Handler) UpdateLifeStyleData(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
+
+// DeleteLifeStyleData godoc
+// @Security ApiKeyAuth
+// @Summary Delete lifestyle data
+// @Description Deletes a specific lifestyle data entry by its ID
+// @Tags Lifestyle
+// @Param id path string true "Data ID"
+// @Success 200 {object} health.DeleteLifeStyleDataResp "Successful operation"
+// @Failure 500 {object} models.Error "Internal server error"
+// @Router /lifestyle/data/{id} [delete]
 func (h *Handler) DeleteLifeStyleData(ctx *gin.Context) {
 	id := ctx.Param("id")
 

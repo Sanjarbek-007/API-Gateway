@@ -9,17 +9,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Get All Users
-// @Description Get all users for admin
+
+// GetUserProfile godoc
+// @Security ApiKeyAuth
+// @Summary Get user profile
+// @Description Retrieves the profile information of a user by their ID
 // @Tags User
-// @Accept json
-// @Produce json
-// @Param id path string true "user id"
-// @Success 200 {object} models.GetProfileRes
-// @Failure 400 {object} models.Error
-// @Failure 404 {object} models.Error
-// @Failure 500 {object} models.Error
-// @Router /users/getUserProfile/{:id} [get]
+// @Param id path string true "User ID"
+// @Success 200 {object} user.GetProfileResp "Successful operation"
+// @Failure 500 {object} models.Error "Internal server error"
+// @Router /user/profile/{id} [get]
 func (h *Handler) GetUserProfile(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -33,18 +32,18 @@ func (h *Handler) GetUserProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
-// @Summary Update User By ID
-// @Description Update user by id for admin
+
+// UpdateUser godoc
+// @Security ApiKeyAuth
+// @Summary Update user profile
+// @Description Updates the profile information of a user
 // @Tags User
-// @Accept json
-// @Produce json
-// @Param id path string true "user id"
-// @Param UpdateUser body models.UpdateProfileReq true "Update user request"
-// @Success 200 {object} models.Update
-// @Failure 400 {object} models.Error
-// @Failure 404 {object} models.Error
-// @Failure 500 {object} models.Error
-// @Router /api/users/{:id} [put]
+// @Param id path string true "User ID"
+// @Param body body models.UpdateProfileReq true "Request body for updating user profile"
+// @Success 200 {object} user.UpdateProfileResp "Successful operation"
+// @Failure 400 {object} models.Error "Invalid request parameters"
+// @Failure 500 {object} models.Error "Internal server error"
+// @Router /user/profile/{id} [put]
 func (h *Handler) UpdateUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var userUpdate models.UpdateProfileReq
@@ -72,17 +71,16 @@ func (h *Handler) UpdateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
-// @Summary Get User By Email
-// @Description Get user by Email for admin
+
+// GetUserByEmail godoc
+// @Security ApiKeyAuth
+// @Summary Get user by email
+// @Description Retrieves a user’s information by their email address
 // @Tags User
-// @Accept json
-// @Produce json
-// @Param email path string true "user email"
-// @Success 200 {object} models.GetProfileRes
-// @Failure 400 {object} models.Error
-// @Failure 404 {object} models.Error
-// @Failure 500 {object} models.Error
-// @Router /api/users/{:email} [get]
+// @Param email path string true "User Email"
+// @Success 200 {object} user.GetUSerByEmailResp "Successful operation"
+// @Failure 500 {object} models.Error "Internal server error"
+// @Router /user/email/{email} [get]
 func (h *Handler) GetUserByEmail(ctx *gin.Context) {
 	email := ctx.Param("email")
     resp, err := h.User.GetUSerByEmail(ctx, &user.GetUSerByEmailReq{
@@ -98,17 +96,15 @@ func (h *Handler) GetUserByEmail(ctx *gin.Context) {
     ctx.JSON(http.StatusOK, resp)
 }
 
-// @Summary Delete User
-// @Description Delete user by token
+
+// DeleteUser godoc
+// @Security ApiKeyAuth
+// @Summary Delete user
+// @Description Deletes the authenticated user’s account
 // @Tags User
-// @Accept json
-// @Produce json
-// @Param id path string true "user id"
-// @Success 204 {object} models.Success
-// @Failure 400 {object} models.Error
-// @Failure 404 {object} models.Error
-// @Failure 500 {object} models.Error
-// @Router /api/users/{:id} [delete]
+// @Success 200 {object} user.DeleteUserResp "Successful operation"
+// @Failure 500 {object} models.Error "Internal server error"
+// @Router /user/delete [delete]
 func (h *Handler) DeleteUser(ctx *gin.Context) {
 	value, ok := ctx.Get("claims")
 	if !ok {

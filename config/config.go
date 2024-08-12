@@ -82,8 +82,33 @@ func CasbinEnforcer(logger *slog.Logger) (*casbin.Enforcer, error) {
 	}
 
 	policies := [][]string{
-		{"user", "/api/users", "GET"},
-		{"admin", "/api/users", "POST"},
+	{"doctor", "/health/medical_recordsAdd", "POST"},
+    {"admin", "/health/medical_recordsAdd", "POST"},
+    {"doctor", "/health/medical_recordsGet/:id", "GET"},
+    {"admin", "/health/medical_recordsGet/:id", "GET"},
+    {"patient", "/health/medical_recordsGet/:id", "GET"},
+    {"doctor", "/health/medical_recordsUp", "PUT"},
+    {"admin", "/health/medical_recordsUp", "PUT"},
+    {"patient", "/health/medical_recordsUp", "PUT"},
+    {"admin", "/health/medical_recordsDel/:id", "DELETE"},
+    {"admin", "/health/medical_records/user/:userId", "GET"},
+
+    {"patient", "/health/lifestyleAdd", "POST"},
+    {"patient", "/health/getalllifestyledata/:limit/:page", "GET"},
+    {"patient", "/health/lifestyleGet/:id", "GET"},
+    {"patient", "/health/lifestyleUp", "PUT"},
+    {"patient", "/health/lifestyleDel/:id", "DELETE"},
+
+    {"patient", "/health/wearable-dataAdd", "POST"},
+    {"patient", "/health/wearabledata/:limit/:page", "GET"},
+    {"patient", "/health/wearable-dataGet/:id", "GET"},
+    {"patient", "/health/wearable-dataUp", "PUT"},
+    {"patient", "/health/wearable-dataDel/:id", "DELETE"},
+
+    {"doctor", "/health/recommendationsAdd", "POST"},
+    {"patient", "/health/monitoring/:user_id/realtime", "GET"},
+    {"patient", "/health/summary/:user_id/daily/:date", "GET"},
+    {"patient", "/health/summary/:user_id/weekly/:start_date", "GET"},
 	}
 
 	_, err = enforcer.AddPolicies(policies)
