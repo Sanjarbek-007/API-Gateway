@@ -67,13 +67,6 @@ func (h *Handler) GenerateHealthRecommendations(c *gin.Context) {
 func (h *Handler) GetRealtimeHealthMonitoring(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	user, err := h.User.GetUserById(ctx, &user.UserId{Id: id})
-	if err!= nil {
-        h.Logger.Error("Error getting user profile: ", "error", err)
-        ctx.JSON(500, models.Error{Message: "Internal server error"})
-        return
-    }
-
 	resp, err := h.Health.GetRealtimeHealthMonitoring(ctx, &health.GetRealtimeHealthMonitoringReq{UserId: id})
 	if err != nil {
 		h.Logger.Error("Error getting user profile: ", "error", err)
@@ -81,13 +74,7 @@ func (h *Handler) GetRealtimeHealthMonitoring(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &health.GetRealtimeHealthMonitoringRes{
-		FirstName: user.User.UserId,
-		LastName: user.User.LastName,
-        RecommendationType: resp.RecommendationType,
-		Description: resp.Description,
-        Priority: resp.Priority,
-	})
+	ctx.JSON(http.StatusOK, resp)
 }
 
 // GetDailyHealthSummary godoc
@@ -104,6 +91,13 @@ func (h *Handler) GetRealtimeHealthMonitoring(ctx *gin.Context) {
 func (h *Handler) GetDailyHealthSummary(ctx *gin.Context) {
 	id := ctx.Param("id")
 
+	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
+	if err!= nil {
+        h.Logger.Error("Error getting user profile: ", "error", err)
+        ctx.JSON(500, models.Error{Message: "Internal server error"})
+        return
+    }
+
 	var getDailySummary health.GetDailyHealthSummaryReq
 
 	if err := ctx.ShouldBindJSON(&getDailySummary); err != nil {
@@ -112,7 +106,7 @@ func (h *Handler) GetDailyHealthSummary(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := h.Health.GetDailyHealthSummary(ctx, &health.GetDailyHealthSummaryReq{UserId: id, Date: getDailySummary.Date})
+	resp, err := h.Health.GetDailyHealthSummary(ctx, &health.GetDailyHealthSummaryReq{FirstName: user.FirstName, LastName: user.LastName, UserId: id, Date: getDailySummary.Date})
 	if err != nil {
 		h.Logger.Error("Error getting user profile: ", "error", err)
 		ctx.JSON(500, models.Error{Message: "Internal server error"})
@@ -136,6 +130,13 @@ func (h *Handler) GetDailyHealthSummary(ctx *gin.Context) {
 func (h *Handler) GetWeeklyHealthSummary(ctx *gin.Context) {
 	id := ctx.Param("id")
 
+	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
+	if err!= nil {
+        h.Logger.Error("Error getting user profile: ", "error", err)
+        ctx.JSON(500, models.Error{Message: "Internal server error"})
+        return
+    }
+
 	var getWeeklySummary health.GetWeeklyHealthSummaryReq
 
 	if err := ctx.ShouldBindJSON(&getWeeklySummary); err != nil {
@@ -144,12 +145,19 @@ func (h *Handler) GetWeeklyHealthSummary(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := h.Health.GetWeeklyHealthSummary(ctx, &health.GetWeeklyHealthSummaryReq{UserId: id, StartDate: getWeeklySummary.StartDate, EndDate: getWeeklySummary.EndDate})
+	resp, err := h.Health.GetWeeklyHealthSummary(ctx, &health.GetWeeklyHealthSummaryReq{
+		FirstName: user.FirstName,
+		LastName: user.LastName,
+		UserId: id, 
+		StartDate: getWeeklySummary.StartDate, 
+		EndDate: getWeeklySummary.EndDate})
 	if err != nil {
 		h.Logger.Error("Error getting user profile: ", "error", err)
 		ctx.JSON(500, models.Error{Message: "Internal server error"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, resp)
+
+
+	ctx.JSON(http.StatusOK,resp)
 }

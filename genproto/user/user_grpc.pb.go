@@ -44,7 +44,7 @@ type UsersClient interface {
 	GetUsers(ctx context.Context, in *UsersListRequest, opts ...grpc.CallOption) (*UsersResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*Void, error)
 	DeleteUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Void, error)
-	GetUserById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*GetUserResponse, error)
+	GetUserById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error)
 	UpdatePassword(ctx context.Context, in *UpdatePasswordReq, opts ...grpc.CallOption) (*Void, error)
 	ChangePassword(ctx context.Context, in *ChangePasswordReq, opts ...grpc.CallOption) (*ChangePasswordRes, error)
 }
@@ -137,9 +137,9 @@ func (c *usersClient) DeleteUser(ctx context.Context, in *UserId, opts ...grpc.C
 	return out, nil
 }
 
-func (c *usersClient) GetUserById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*GetUserResponse, error) {
+func (c *usersClient) GetUserById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetUserResponse)
+	out := new(User)
 	err := c.cc.Invoke(ctx, Users_GetUserById_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -179,7 +179,7 @@ type UsersServer interface {
 	GetUsers(context.Context, *UsersListRequest) (*UsersResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*Void, error)
 	DeleteUser(context.Context, *UserId) (*Void, error)
-	GetUserById(context.Context, *UserId) (*GetUserResponse, error)
+	GetUserById(context.Context, *UserId) (*User, error)
 	UpdatePassword(context.Context, *UpdatePasswordReq) (*Void, error)
 	ChangePassword(context.Context, *ChangePasswordReq) (*ChangePasswordRes, error)
 	mustEmbedUnimplementedUsersServer()
@@ -213,7 +213,7 @@ func (UnimplementedUsersServer) UpdateUser(context.Context, *UpdateUserRequest) 
 func (UnimplementedUsersServer) DeleteUser(context.Context, *UserId) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
 }
-func (UnimplementedUsersServer) GetUserById(context.Context, *UserId) (*GetUserResponse, error) {
+func (UnimplementedUsersServer) GetUserById(context.Context, *UserId) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
 }
 func (UnimplementedUsersServer) UpdatePassword(context.Context, *UpdatePasswordReq) (*Void, error) {

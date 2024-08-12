@@ -2,12 +2,12 @@ package handler
 
 import (
 	"api-gateway/genproto/health"
+	"api-gateway/genproto/user"
 	"api-gateway/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
-
 
 // AddWearableData godoc
 // @Security ApiKeyAuth
@@ -53,7 +53,14 @@ func (h *Handler) AddWearableData(ctx *gin.Context) {
 func (h *Handler) GetWearableData(ctx *gin.Context) {
 	id := ctx.Param("user_id")
 
-	resp, err := h.Wearable.GetWearableData(ctx, &health.GetWearableDataReq{UserId: id})
+	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
+	if err!= nil {
+        h.Logger.Error("Error getting user profile: ", "error", err)
+        ctx.JSON(500, models.Error{Message: "Internal server error"})
+        return
+    }
+
+	resp, err := h.Wearable.GetWearableData(ctx, &health.GetWearableDataReq{UserId: id, FirstName: user.FirstName, LastName: user.LastName})
 	if err != nil {
 		h.Logger.Error("Error Get Medical record Style: ", "error", err)
 		ctx.JSON(500, models.Error{Message: "Internal server error"})

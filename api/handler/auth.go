@@ -120,7 +120,7 @@ func (h *Handler) DeleteUser(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := h.User.DeleteUser(ctx, &user.UserId{Id: claims.ID})
+	resp, err := h.User.DeleteUser(ctx, &user.UserId{UserId: claims.ID})
 	if err != nil {
 		h.Logger.Error("Error deleting user", "error", err.Error())
 		ctx.JSON(http.StatusInternalServerError, models.Error{

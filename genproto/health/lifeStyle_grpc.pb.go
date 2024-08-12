@@ -32,7 +32,7 @@ const (
 type LifeStyleClient interface {
 	AddLifeStyleData(ctx context.Context, in *AddLifeStyleDataReq, opts ...grpc.CallOption) (*AddLifeStyleDataRes, error)
 	GetLifeStyleData(ctx context.Context, in *GetLifeStyleDataReq, opts ...grpc.CallOption) (*GetLifeStyleDataRes, error)
-	GetLifeStyleDataById(ctx context.Context, in *GetLifeStyleDataByIdReq, opts ...grpc.CallOption) (*GetLifeStyleDataRes, error)
+	GetLifeStyleDataById(ctx context.Context, in *GetLifeStyleDataByIdReq, opts ...grpc.CallOption) (*GetLifeStyleDataByIdRes, error)
 	UpdateLifeStyleData(ctx context.Context, in *UpdateLifeStyleDataReq, opts ...grpc.CallOption) (*UpdateLifeStyleDataRes, error)
 	DeleteLifeStyleData(ctx context.Context, in *DeleteLifeStyleDataReq, opts ...grpc.CallOption) (*DeleteLifeStyleDataRes, error)
 }
@@ -65,9 +65,9 @@ func (c *lifeStyleClient) GetLifeStyleData(ctx context.Context, in *GetLifeStyle
 	return out, nil
 }
 
-func (c *lifeStyleClient) GetLifeStyleDataById(ctx context.Context, in *GetLifeStyleDataByIdReq, opts ...grpc.CallOption) (*GetLifeStyleDataRes, error) {
+func (c *lifeStyleClient) GetLifeStyleDataById(ctx context.Context, in *GetLifeStyleDataByIdReq, opts ...grpc.CallOption) (*GetLifeStyleDataByIdRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetLifeStyleDataRes)
+	out := new(GetLifeStyleDataByIdRes)
 	err := c.cc.Invoke(ctx, LifeStyle_GetLifeStyleDataById_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func (c *lifeStyleClient) DeleteLifeStyleData(ctx context.Context, in *DeleteLif
 type LifeStyleServer interface {
 	AddLifeStyleData(context.Context, *AddLifeStyleDataReq) (*AddLifeStyleDataRes, error)
 	GetLifeStyleData(context.Context, *GetLifeStyleDataReq) (*GetLifeStyleDataRes, error)
-	GetLifeStyleDataById(context.Context, *GetLifeStyleDataByIdReq) (*GetLifeStyleDataRes, error)
+	GetLifeStyleDataById(context.Context, *GetLifeStyleDataByIdReq) (*GetLifeStyleDataByIdRes, error)
 	UpdateLifeStyleData(context.Context, *UpdateLifeStyleDataReq) (*UpdateLifeStyleDataRes, error)
 	DeleteLifeStyleData(context.Context, *DeleteLifeStyleDataReq) (*DeleteLifeStyleDataRes, error)
 	mustEmbedUnimplementedLifeStyleServer()
@@ -117,7 +117,7 @@ func (UnimplementedLifeStyleServer) AddLifeStyleData(context.Context, *AddLifeSt
 func (UnimplementedLifeStyleServer) GetLifeStyleData(context.Context, *GetLifeStyleDataReq) (*GetLifeStyleDataRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLifeStyleData not implemented")
 }
-func (UnimplementedLifeStyleServer) GetLifeStyleDataById(context.Context, *GetLifeStyleDataByIdReq) (*GetLifeStyleDataRes, error) {
+func (UnimplementedLifeStyleServer) GetLifeStyleDataById(context.Context, *GetLifeStyleDataByIdReq) (*GetLifeStyleDataByIdRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLifeStyleDataById not implemented")
 }
 func (UnimplementedLifeStyleServer) UpdateLifeStyleData(context.Context, *UpdateLifeStyleDataReq) (*UpdateLifeStyleDataRes, error) {
