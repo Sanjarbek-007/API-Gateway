@@ -42,10 +42,47 @@ definitions:
       last_name:
         type: string
     type: object
+host: localhost:8080
 info:
   contact: {}
+  description: api gateway service
+  title: Api Getaway
+  version: "1.0"
 paths:
-  /api/users:
+  /api/users/{:email}:
+    get:
+      consumes:
+      - application/json
+      description: Get user by Email for admin
+      parameters:
+      - description: user email
+        in: path
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetProfileRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get User By Email
+      tags:
+      - User
+  /api/users/{:id}:
     delete:
       consumes:
       - application/json
@@ -116,40 +153,7 @@ paths:
       summary: Update User By ID
       tags:
       - User
-  /api/users/{email}:
-    get:
-      consumes:
-      - application/json
-      description: Get user by Email for admin
-      parameters:
-      - description: user email
-        in: path
-        name: email
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.GetProfileRes'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Error'
-      summary: Get User By Email
-      tags:
-      - User
-  /users/getUserProfile:
+  /users/getUserProfile/{:id}:
     get:
       consumes:
       - application/json
@@ -182,4 +186,9 @@ paths:
       summary: Get All Users
       tags:
       - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

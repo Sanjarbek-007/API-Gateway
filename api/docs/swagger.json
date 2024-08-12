@@ -1,10 +1,64 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "api gateway service",
+        "title": "Api Getaway",
+        "contact": {},
+        "version": "1.0"
     },
+    "host": "localhost:8080",
     "paths": {
-        "/api/users": {
+        "/api/users/{:email}": {
+            "get": {
+                "description": "Get user by Email for admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get User By Email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.GetProfileRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/{:id}": {
             "put": {
                 "description": "Update user by id for admin",
                 "consumes": [
@@ -111,57 +165,7 @@
                 }
             }
         },
-        "/api/users/{email}": {
-            "get": {
-                "description": "Get user by Email for admin",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Get User By Email",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "user email",
-                        "name": "email",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.GetProfileRes"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/users/getUserProfile": {
+        "/users/getUserProfile/{:id}": {
             "get": {
                 "description": "Get all users for admin",
                 "consumes": [
@@ -279,6 +283,13 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

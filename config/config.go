@@ -83,13 +83,6 @@ func CasbinEnforcer(logger *slog.Logger) (*casbin.Enforcer, error) {
 
 	policies := [][]string{
 		{"user", "/api/users", "GET"},
-		{"user", "/api/users", "PUT"},
-		{"user", "/api/users", "DELETE"},
-		{"user", "/api/users/recommendation", "GET"},
-		{"user", "/api/users/products", "GET"},
-		{"admin", "/api/users/:id", "GET"},
-		{"admin", "/api/users/:id", "PUT"},
-		{"admin", "/api/users/:id", "DELETE"},
 		{"admin", "/api/users", "POST"},
 	}
 
