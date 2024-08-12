@@ -1,0 +1,6 @@
+time=2024-08-12T10:29:57.498+05:00 level=INFO msg="API Gateway started successfully!"
+time=2024-08-12T10:29:57.501+05:00 level=ERROR msg="Error creating Casbin adapter" error="dial tcp 127.0.0.1:5432: connect: connection refused"
+time=2024-08-12T10:29:57.501+05:00 level=ERROR msg="Error initializing enforcer" error="dial tcp 127.0.0.1:5432: connect: connection refused"
+time=2024-08-12T10:31:03.720+05:00 level=INFO msg="API Gateway started successfully!"
+time=2024-08-12T10:31:03.723+05:00 level=ERROR msg="Error creating Casbin adapter" error="dial tcp 127.0.0.1:5432: connect: connection refused"
+time=2024-08-12T10:31:03.723+05:00 level=ERROR msg="Error initializing enforcer" error="dial tcp 127.0.0.1:5432: connect: connection refused"
