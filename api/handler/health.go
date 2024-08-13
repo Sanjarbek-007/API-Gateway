@@ -13,59 +13,66 @@ import (
 
 // GenerateHealthRecommendations godoc
 // @Security ApiKeyAuth
-// @Summary generate health recommendations
-// @Description generates health recommendations for a user
+// @Summary Generate health recommendations
+// @Description Generates health recommendations for a user
 // @Tags HealthCheck
-// @Param id path string true "id"
-// @Success 200 {object} string "message"
-// @Failure 400 {object} string "Invalid data"
-// @Failure 500 {object} string "Server error"
-// @Router health/GenerateHealthRecommendation [post]
+// @Accept json
+// @Produce json
+// @Param body body health.GenerateHealthRecommendationsReq true "Request body for generating health recommendations"
+// @Success 200 {object} map[string]string "Successful operation"
+// @Failure 400 {object} map[string]string "Invalid data"
+// @Failure 500 {object} map[string]string "Server error"
+// @Router /api/health/generate [post]
 func (h *Handler) GenerateHealthRecommendations(c *gin.Context) {
 	h.Logger.Info("GenerateHealthRecommendations called")
-	id := c.Param("id")
-	req := &health.GenerateHealthRecommendationsReq{UserId: id}
+
+	var req health.GenerateHealthRecommendationsReq
+	if err := c.BindJSON(&req); err != nil {
+		h.Logger.Error("Invalid request body", "error", err)
+		c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid data"})
+		return
+	}
 
 	writerKafka, err := kafka.NewKafkaProducerInit([]string{"localhost:9092"})
 	if err != nil {
-		h.Logger.Error(err.Error())
-		c.JSON(500, err.Error())
+		h.Logger.Error("Error initializing Kafka producer", "error", err)
+		c.JSON(http.StatusInternalServerError, map[string]string{"message": "Server error"})
 		return
-
 	}
 	defer writerKafka.Close()
+
 	msgBytes, err := json.Marshal(&req)
 	if err != nil {
-		h.Logger.Error(err.Error())
-		c.JSON(500, err.Error())
+		h.Logger.Error("Error marshaling request to JSON", "error", err)
+		c.JSON(http.StatusInternalServerError, map[string]string{"message": "Server error"})
 		return
-
 	}
 
 	err = writerKafka.Producermessage("health", msgBytes)
 	if err != nil {
-		h.Logger.Error(err.Error())
-		c.JSON(500, err.Error())
+		h.Logger.Error("Error producing Kafka message", "error", err)
+		c.JSON(http.StatusInternalServerError, map[string]string{"message": "Server error"})
 		return
 	}
 
-	h.Logger.Info("DeleteLanguage finished successfully")
-	c.JSON(200, gin.H{"message": "Recommendations generated successfully"})
+	h.Logger.Info("GenerateHealthRecommendations finished successfully")
+	c.JSON(http.StatusOK, map[string]string{"message": "Recommendations generated successfully"})
 }
-
 
 // GetRealtimeHealthMonitoring godoc
 // @Security ApiKeyAuth
 // @Summary Get real-time health monitoring data
 // @Description Retrieves real-time health monitoring data for a user
 // @Tags HealthCheck
-// @Param id path string true "User ID"
-// @Success 200 {object} health.GetRealtimeHealthMonitoringResp "Successful operation"
+// @Accept       json
+// @Produce      json
+// @Param user_id path string true "User ID"
+// @Success 200 {object} models.GetRealtimeHealthMonitoringRes "Successful operation"
 // @Failure 400 {object} models.Error "Invalid request parameters"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /health/realtime/{id} [get]
+// @Router /api/health/getRealtimeHealthMonitoring/{user_id} [get]
 func (h *Handler) GetRealtimeHealthMonitoring(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id := ctx.Param("user_id")
 
 	resp, err := h.Health.GetRealtimeHealthMonitoring(ctx, &health.GetRealtimeHealthMonitoringReq{UserId: id})
 	if err != nil {
@@ -82,60 +89,70 @@ func (h *Handler) GetRealtimeHealthMonitoring(ctx *gin.Context) {
 // @Summary Get daily health summary
 // @Description Retrieves the daily health summary for a user
 // @Tags HealthCheck
-// @Param id path string true "User ID"
-// @Param body body health.GetDailyHealthSummaryReq true "Request body for daily health summary"
-// @Success 200 {object} health.GetDailyHealthSummaryResp "Successful operation"
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "User ID"
+// @Param        body body models.GetDailyHealthSummaryReq true "Request body for getting daily health summary"
+// @Success 200 {object} health.GetDailyHealthSummaryRes "Successful operation"
 // @Failure 400 {object} models.Error "Invalid request parameters"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /health/daily/{id} [post]
+// @Router /api/health/getDailyHealthSummary/{id} [post]
 func (h *Handler) GetDailyHealthSummary(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
-	if err!= nil {
-        h.Logger.Error("Error getting user profile: ", "error", err)
-        ctx.JSON(500, models.Error{Message: "Internal server error"})
-        return
-    }
+	if err != nil {
+		h.Logger.Error("Error getting user profile", "error", err)
+		ctx.JSON(http.StatusInternalServerError, models.Error{Message: "Internal server error"})
+		return
+	}
 
 	var getDailySummary health.GetDailyHealthSummaryReq
 
 	if err := ctx.ShouldBindJSON(&getDailySummary); err != nil {
-		h.Logger.Error("Error binding JSON: ", "error", err)
-		ctx.JSON(400, models.Error{Message: "Invalid request parameters"})
+		h.Logger.Error("Error binding JSON", "error", err)
+		ctx.JSON(http.StatusBadRequest, models.Error{Message: "Invalid request parameters"})
 		return
 	}
 
-	resp, err := h.Health.GetDailyHealthSummary(ctx, &health.GetDailyHealthSummaryReq{FirstName: user.FirstName, LastName: user.LastName, UserId: id, Date: getDailySummary.Date})
+	resp, err := h.Health.GetDailyHealthSummary(ctx, &health.GetDailyHealthSummaryReq{
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		UserId:    id,
+		Date:      getDailySummary.Date,
+	})
 	if err != nil {
-		h.Logger.Error("Error getting user profile: ", "error", err)
-		ctx.JSON(500, models.Error{Message: "Internal server error"})
+		h.Logger.Error("Error getting daily health summary", "error", err)
+		ctx.JSON(http.StatusInternalServerError, models.Error{Message: "Internal server error"})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, resp)
 }
 
+
 // GetWeeklyHealthSummary godoc
 // @Security ApiKeyAuth
 // @Summary Get weekly health summary
 // @Description Retrieves the weekly health summary for a user
 // @Tags HealthCheck
+// @Accept       json
+// @Produce      json
 // @Param id path string true "User ID"
 // @Param body body health.GetWeeklyHealthSummaryReq true "Request body for weekly health summary"
-// @Success 200 {object} health.GetWeeklyHealthSummaryResp "Successful operation"
+// @Success 200 {object} health.GetWeeklyHealthSummaryRes "Successful operation"
 // @Failure 400 {object} models.Error "Invalid request parameters"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /health/weekly/{id} [post]
+// @Router /api/health/weekly/{id} [post]
 func (h *Handler) GetWeeklyHealthSummary(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
-	if err!= nil {
-        h.Logger.Error("Error getting user profile: ", "error", err)
-        ctx.JSON(500, models.Error{Message: "Internal server error"})
-        return
-    }
+	if err != nil {
+		h.Logger.Error("Error getting user profile: ", "error", err)
+		ctx.JSON(500, models.Error{Message: "Internal server error"})
+		return
+	}
 
 	var getWeeklySummary health.GetWeeklyHealthSummaryReq
 
@@ -147,17 +164,15 @@ func (h *Handler) GetWeeklyHealthSummary(ctx *gin.Context) {
 
 	resp, err := h.Health.GetWeeklyHealthSummary(ctx, &health.GetWeeklyHealthSummaryReq{
 		FirstName: user.FirstName,
-		LastName: user.LastName,
-		UserId: id, 
-		StartDate: getWeeklySummary.StartDate, 
-		EndDate: getWeeklySummary.EndDate})
+		LastName:  user.LastName,
+		UserId:    id,
+		StartDate: getWeeklySummary.StartDate,
+		EndDate:   getWeeklySummary.EndDate})
 	if err != nil {
 		h.Logger.Error("Error getting user profile: ", "error", err)
 		ctx.JSON(500, models.Error{Message: "Internal server error"})
 		return
 	}
 
-
-
-	ctx.JSON(http.StatusOK,resp)
+	ctx.JSON(http.StatusOK, resp)
 }

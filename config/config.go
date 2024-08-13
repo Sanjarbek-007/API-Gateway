@@ -35,14 +35,14 @@ func Load() Config {
 	config := Config{}
 
 	config.HTTP_PORT = cast.ToString(coalesce("HTTP_PORT", ":8080"))
-	config.GRPC_USER_PORT = cast.ToString(coalesce("GRPC_USER_PORT", 50050))
-	config.GRPC_PRODUCT_PORT = cast.ToString(coalesce("GRPC_PRODUCT_PORT", 50051))
+	config.GRPC_USER_PORT = cast.ToString(coalesce("GRPC_USER_PORT", "50051"))
+	config.GRPC_PRODUCT_PORT = cast.ToString(coalesce("GRPC_PRODUCT_PORT", "5551"))
 	config.DB_HOST = cast.ToString(coalesce("DB_HOST", "localhost"))
 	config.DB_PORT = cast.ToString(coalesce("DB_PORT", "5432"))
 	config.DB_USER = cast.ToString(coalesce("DB_USER", "postgres"))
 	config.DB_PASSWORD = cast.ToString(coalesce("DB_PASSWORD", "1111"))
 	config.DB_NAME = cast.ToString(coalesce("DB_NAME", "postgres"))
-	config.ACCESS_TOKEN = cast.ToString(coalesce("ACCESS_TOKEN", "key_is_really_easy"))
+	config.ACCESS_TOKEN = cast.ToString(coalesce("ACCESS_TOKEN", "key"))
 
 	return config
 }
@@ -94,7 +94,7 @@ func CasbinEnforcer(logger *slog.Logger) (*casbin.Enforcer, error) {
     {"admin", "/health/medical_records/user/:userId", "GET"},
 
     {"patient", "/health/lifestyleAdd", "POST"},
-    {"patient", "/health/getalllifestyledata/:limit/:page", "GET"},
+    {"patient", "/api/lifestyle/getLifestyleById/:id", "GET"},
     {"patient", "/health/lifestyleGet/:id", "GET"},
     {"patient", "/health/lifestyleUp", "PUT"},
     {"patient", "/health/lifestyleDel/:id", "DELETE"},

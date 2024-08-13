@@ -4,6 +4,7 @@ import (
 	"api-gateway/genproto/health"
 	"api-gateway/genproto/user"
 	"api-gateway/models"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,12 +15,13 @@ import (
 // @Summary Add lifestyle data
 // @Description Adds lifestyle data for a user
 // @Tags Lifestyle
-// @Param id path string true "User ID"
+// @Accept       json
+// @Produce      json
 // @Param body body health.AddLifeStyleDataReq true "Request body for adding lifestyle data"
-// @Success 200 {object} health.AddLifeStyleDataResp "Successful operation"
+// @Success 200 {object} models.Success "Successful operation"
 // @Failure 400 {object} models.Error "Invalid request parameters"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /lifestyle/data/{id} [post]
+// @Router /api/lifestyle/addLifestyleData [post]
 func (h *Handler) AddLifeStyleData(ctx *gin.Context) {
 	var life health.AddLifeStyleDataReq
 
@@ -30,14 +32,14 @@ func (h *Handler) AddLifeStyleData(ctx *gin.Context) {
 	}
 	id := ctx.Param("id")
 
-	resp, err := h.Lifestyle.AddLifeStyleData(ctx, &health.AddLifeStyleDataReq{UserId: id, DataType: life.DataType, DataValue: life.DataValue})
+	_, err := h.Lifestyle.AddLifeStyleData(ctx, &health.AddLifeStyleDataReq{UserId: id, DataType: life.DataType, DataValue: life.DataValue})
 	if err != nil {
 		h.Logger.Error("Error Adding user life Style: ", "error", err)
 		ctx.JSON(500, models.Error{Message: "Internal server error"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, models.Success{Message: "LifeStyle data added successfully"})
 }
 
 
@@ -46,13 +48,21 @@ func (h *Handler) AddLifeStyleData(ctx *gin.Context) {
 // @Summary Get lifestyle data
 // @Description Retrieves lifestyle data for a user
 // @Tags Lifestyle
+// @Accept       json
+// @Produce      json
 // @Param user_id path string true "User ID"
-// @Success 200 {object} health.GetLifeStyleDataResp "Successful operation"
+// @Success 200 {object} models.GetLifeStyle "Successful operation"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /lifestyle/data/{user_id} [get]
+// @Router /api/lifestyle/getAllLifestyleData/{user_id} [get]
 func (h *Handler) GetLifeStyleData(ctx *gin.Context) {
-	id := ctx.Param("user_id")
+	userID, exists := ctx.Get("user_id")
+    if !exists {
+        ctx.JSON(http.StatusUnauthorized, models.Error{Message: "User ID not found in token"})
+        return
+    }
 
+    // Convert to string
+    id := userID.(string)
 	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
 	if err!= nil {
         h.Logger.Error("Error getting user profile: ", "error", err)
@@ -65,7 +75,7 @@ func (h *Handler) GetLifeStyleData(ctx *gin.Context) {
 		FirstName: user.FirstName,
 	    LastName: user.LastName,
     })
-	
+
 	if err != nil {
 		h.Logger.Error("Error Get user life Style: ", "error", err)
 		ctx.JSON(500, models.Error{Message: "Internal server error"})
@@ -80,11 +90,14 @@ func (h *Handler) GetLifeStyleData(ctx *gin.Context) {
 // @Summary Get lifestyle data by ID
 // @Description Retrieves lifestyle data for a specific entry by its ID
 // @Tags Lifestyle
+// @Accept       json
+// @Produce      json
 // @Param id path string true "Data ID"
-// @Success 200 {object} health.GetLifeStyleDataByIdResp "Successful operation"
+// @Success 200 {object} health.GetLifeStyleDataByIdRes "Successful operation"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /lifestyle/data/id/{id} [get]
+// @Router /api/lifestyle/getLifestyleById/{id} [get]
 func (h *Handler) GetLifeStyleDataById(ctx *gin.Context) {
+	fmt.Println("salom")
 	id := ctx.Param("id")
 
 	resp, err := h.Lifestyle.GetLifeStyleDataById(ctx, &health.GetLifeStyleDataByIdReq{Id: id})
@@ -103,11 +116,13 @@ func (h *Handler) GetLifeStyleDataById(ctx *gin.Context) {
 // @Summary Update lifestyle data
 // @Description Updates a specific lifestyle data entry
 // @Tags Lifestyle
+// @Accept       json
+// @Produce      json
 // @Param body body health.UpdateLifeStyleDataReq true "Request body for updating lifestyle data"
-// @Success 200 {object} health.UpdateLifeStyleDataResp "Successful operation"
+// @Success 200 {object} models.Success "Successful operation"
 // @Failure 400 {object} models.Error "Invalid request parameters"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /lifestyle/data/update [put]
+// @Router /api/lifestyle/updateLifestyleData [put]
 func (h *Handler) UpdateLifeStyleData(ctx *gin.Context) {
 	var update health.UpdateLifeStyleDataReq
 
@@ -117,14 +132,14 @@ func (h *Handler) UpdateLifeStyleData(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := h.Lifestyle.UpdateLifeStyleData(ctx, &health.UpdateLifeStyleDataReq{Id: update.Id, DataType: update.DataType, DataValue: update.DataValue})
+	_, err := h.Lifestyle.UpdateLifeStyleData(ctx, &health.UpdateLifeStyleDataReq{Id: update.Id, DataType: update.DataType, DataValue: update.DataValue})
 	if err != nil {
 		h.Logger.Error("Error Updating user life Style: ", "error", err)
 		ctx.JSON(500, models.Error{Message: "Internal server error"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, models.Success{Message: "Lifestyle data updated successfully"})
 }
 
 
@@ -133,19 +148,21 @@ func (h *Handler) UpdateLifeStyleData(ctx *gin.Context) {
 // @Summary Delete lifestyle data
 // @Description Deletes a specific lifestyle data entry by its ID
 // @Tags Lifestyle
+// @Accept       json
+// @Produce      json
 // @Param id path string true "Data ID"
-// @Success 200 {object} health.DeleteLifeStyleDataResp "Successful operation"
+// @Success 200 {object} models.Success "Successful operation"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /lifestyle/data/{id} [delete]
+// @Router /api/lifestyle/deleteLifestyleData/{id} [delete]
 func (h *Handler) DeleteLifeStyleData(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-    resp, err := h.Lifestyle.DeleteLifeStyleData(ctx, &health.DeleteLifeStyleDataReq{Id: id})
+    _, err := h.Lifestyle.DeleteLifeStyleData(ctx, &health.DeleteLifeStyleDataReq{Id: id})
     if err!= nil {
         h.Logger.Error("Error deleting user life Style: ", "error", err)
         ctx.JSON(500, models.Error{Message: "Internal server error"})
         return
     }
 
-    ctx.JSON(http.StatusOK, resp)
+    ctx.JSON(http.StatusOK, models.Success{Message: "Lifestyle data deleted successfully"})
 }

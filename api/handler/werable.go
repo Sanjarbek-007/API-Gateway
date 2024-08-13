@@ -14,12 +14,13 @@ import (
 // @Summary Add wearable data
 // @Description Adds wearable data for a user
 // @Tags WearableData
-// @Param id path string true "User ID"
+// @Accept       json
+// @Produce      json
 // @Param body body health.AddWearableDataReq true "Request body for adding wearable data"
-// @Success 200 {object} health.AddWearableDataResp "Successful operation"
+// @Success 200 {object} models.Success "Successful operation"
 // @Failure 400 {object} models.Error "Invalid request parameters"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /wearable/data/{id} [post]
+// @Router /api/wearable/add [post]
 func (h *Handler) AddWearableData(ctx *gin.Context) {
 	var warable health.AddWearableDataReq
 
@@ -28,16 +29,15 @@ func (h *Handler) AddWearableData(ctx *gin.Context) {
 		ctx.JSON(400, models.Error{Message: "Invalid request parameters"})
 		return
 	}
-	id := ctx.Param("id")
 
-	resp, err := h.Wearable.AddWearableData(ctx, &health.AddWearableDataReq{UserId: id, DeviceType: warable.DeviceType, DataType: warable.DataType, DataValue: warable.DataValue})
+	_, err := h.Wearable.AddWearableData(ctx, &health.AddWearableDataReq{UserId: warable.UserId, DeviceType: warable.DeviceType, DataType: warable.DataType, DataValue: warable.DataValue})
 	if err != nil {
 		h.Logger.Error("Error Adding user Werable data: ", "error", err)
 		ctx.JSON(500, models.Error{Message: "Internal server error"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, models.Success{Message: "Wearable data added successfully"})
 }
 
 
@@ -46,12 +46,20 @@ func (h *Handler) AddWearableData(ctx *gin.Context) {
 // @Summary Get wearable data
 // @Description Retrieves all wearable data for a user
 // @Tags WearableData
+// @Accept       json
+// @Produce      json
 // @Param user_id path string true "User ID"
-// @Success 200 {object} health.GetWearableDataResp "Successful operation"
+// @Success 200 {object} models.Warable "Successful operation"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /wearable/data/{user_id} [get]
+// @Router /api/wearable/get/{user_id} [get]
 func (h *Handler) GetWearableData(ctx *gin.Context) {
-	id := ctx.Param("user_id")
+	userID, exists := ctx.Get("user_id")
+    if !exists {
+        ctx.JSON(http.StatusUnauthorized, models.Error{Message: "User ID not found in token"})
+        return
+    }
+
+    id := userID.(string)
 
 	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
 	if err!= nil {
@@ -76,10 +84,12 @@ func (h *Handler) GetWearableData(ctx *gin.Context) {
 // @Summary Get wearable data by ID
 // @Description Retrieves a specific wearable data entry by its ID
 // @Tags WearableData
+// @Accept       json
+// @Produce      json
 // @Param id path string true "Wearable Data ID"
-// @Success 200 {object} health.GetWearableDataByIdResp "Successful operation"
+// @Success 200 {object} health.GetWearableDataByIdRes "Successful operation"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /wearable/data/id/{id} [get]
+// @Router /api/wearable/getById/{id} [get]
 func (h *Handler) GetWearableDataById(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -99,12 +109,14 @@ func (h *Handler) GetWearableDataById(ctx *gin.Context) {
 // @Summary Update wearable data
 // @Description Updates a specific wearable data entry
 // @Tags WearableData
+// @Accept       json
+// @Produce      json
 // @Param id path string true "Wearable Data ID"
 // @Param body body health.UpdateWearableDataReq true "Request body for updating wearable data"
-// @Success 200 {object} health.UpdateWearableDataResp "Successful operation"
+// @Success 200 {object} models.Success "Successful operation"
 // @Failure 400 {object} models.Error "Invalid request parameters"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /wearable/data/{id} [put]
+// @Router /api/wearable/update [put]
 func (h *Handler) UpdateWearableData(ctx *gin.Context) {
 	var warable health.UpdateWearableDataReq
 
@@ -115,14 +127,14 @@ func (h *Handler) UpdateWearableData(ctx *gin.Context) {
     }
     id := ctx.Param("id")
 
-    resp, err := h.Wearable.UpdateWearableData(ctx, &health.UpdateWearableDataReq{Id: id, DeviceType: warable.DeviceType, DataType: warable.DataType, DataValue: warable.DataValue})
+    _, err := h.Wearable.UpdateWearableData(ctx, &health.UpdateWearableDataReq{Id: id, DeviceType: warable.DeviceType, DataType: warable.DataType, DataValue: warable.DataValue})
     if err!= nil {
         h.Logger.Error("Error Updating user Wearable data: ", "error", err)
         ctx.JSON(500, models.Error{Message: "Internal server error"})
         return
     }
 
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, models.Success{Message: "Wearable data updated successfully"})
 }
 
 
@@ -131,19 +143,21 @@ func (h *Handler) UpdateWearableData(ctx *gin.Context) {
 // @Summary Delete wearable data
 // @Description Deletes a specific wearable data entry by its ID
 // @Tags WearableData
+// @Accept       json
+// @Produce      json
 // @Param id path string true "Wearable Data ID"
-// @Success 200 {object} health.DeleteWearableDataResp "Successful operation"
+// @Success 200 {object} models.Success "Successful operation"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /wearable/data/{id} [delete]
+// @Router /api/wearable/delete/{id} [delete]
 func (h *Handler) DeleteWearableData(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-    resp, err := h.Wearable.DeleteWearableData(ctx, &health.DeleteWearableDataReq{Id: id})
+    _, err := h.Wearable.DeleteWearableData(ctx, &health.DeleteWearableDataReq{Id: id})
     if err!= nil {
         h.Logger.Error("Error deleting user Wearable data: ", "error", err)
         ctx.JSON(500, models.Error{Message: "Internal server error"})
         return
     }
 
-    ctx.JSON(http.StatusOK, resp)
+    ctx.JSON(http.StatusOK, models.Success{Message: "Wearable data deleted successfully"})
 }

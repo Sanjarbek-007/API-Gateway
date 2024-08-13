@@ -1,7 +1,219 @@
+basePath: /
 definitions:
+  health.AddLifeStyleDataReq:
+    properties:
+      data_type:
+        type: string
+      data_value:
+        type: string
+      user_id:
+        type: string
+    type: object
+  health.AddMedicalReportReq:
+    properties:
+      attachments:
+        items:
+          $ref: '#/definitions/health.Attachment'
+        type: array
+      description:
+        type: string
+      doctor_id:
+        type: string
+      record_date:
+        type: string
+      record_type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  health.AddWearableDataReq:
+    properties:
+      data_type:
+        type: string
+      data_value:
+        type: string
+      device_type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  health.Attachment:
+    properties:
+      file_url:
+        type: string
+    type: object
+  health.GenerateHealthRecommendationsReq:
+    properties:
+      description:
+        type: string
+      priority:
+        type: integer
+      recommendation_type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  health.GetDailyHealthSummaryRes:
+    properties:
+      recommendations:
+        $ref: '#/definitions/health.HealthRecommendation'
+    type: object
+  health.GetLifeStyleByIdRes:
+    properties:
+      data_type:
+        type: string
+      data_value:
+        type: string
+      id:
+        type: string
+      recorded_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+  health.GetLifeStyleDataByIdRes:
+    properties:
+      life_style:
+        items:
+          $ref: '#/definitions/health.GetLifeStyleByIdRes'
+        type: array
+    type: object
+  health.GetMedicalReportByIdRes:
+    properties:
+      attachments:
+        items:
+          $ref: '#/definitions/health.Attachment'
+        type: array
+      description:
+        type: string
+      doctor_id:
+        type: string
+      doctor_name:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      record_date:
+        type: string
+      record_type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  health.GetWearableDataByIdRes:
+    properties:
+      get_warable_id:
+        items:
+          $ref: '#/definitions/health.WearableById'
+        type: array
+    type: object
+  health.GetWeeklyHealthSummaryReq:
+    properties:
+      end_date:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+  health.GetWeeklyHealthSummaryRes:
+    properties:
+      recommendations:
+        items:
+          $ref: '#/definitions/health.HealthRecommendation'
+        type: array
+    type: object
+  health.HealthRecommendation:
+    properties:
+      description:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      priority:
+        type: integer
+      recommendation_type:
+        type: string
+    type: object
+  health.UpdateLifeStyleDataReq:
+    properties:
+      data_type:
+        type: string
+      data_value:
+        type: string
+      id:
+        type: string
+    type: object
+  health.UpdateMedicalReportReq:
+    properties:
+      attachments:
+        items:
+          $ref: '#/definitions/health.Attachment'
+        type: array
+      description:
+        type: string
+      doctor_id:
+        type: string
+      id:
+        type: string
+      record_type:
+        type: string
+    type: object
+  health.UpdateWearableDataReq:
+    properties:
+      data_type:
+        type: string
+      data_value:
+        type: string
+      device_type:
+        type: string
+      id:
+        type: string
+    type: object
+  health.WearableById:
+    properties:
+      data_type:
+        type: string
+      data_value:
+        type: string
+      device_type:
+        type: string
+      id:
+        type: string
+      recorded_timestamp:
+        type: string
+      user_id:
+        type: string
+    type: object
   models.Error:
     properties:
       message:
+        type: string
+    type: object
+  models.GetDailyHealthSummaryReq:
+    properties:
+      date:
+        type: string
+      user_id:
+        type: string
+    type: object
+  models.GetLifeStyle:
+    properties:
+      data_type:
+        type: string
+      data_value:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      recorded_date:
         type: string
     type: object
   models.GetProfileRes:
@@ -19,12 +231,39 @@ definitions:
       role:
         type: string
     type: object
-  models.Success:
+  models.GetRealtimeHealthMonitoringRes:
     properties:
-      message:
+      description:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      priority:
+        type: integer
+      recommendation_type:
         type: string
     type: object
-  models.Update:
+  models.MedicalReport:
+    properties:
+      attachments:
+        items:
+          type: string
+        type: array
+      description:
+        type: string
+      doctor_name:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      record_type:
+        type: string
+      recorded_date:
+        type: string
+    type: object
+  models.Success:
     properties:
       message:
         type: string
@@ -42,6 +281,42 @@ definitions:
       last_name:
         type: string
     type: object
+  models.Warable:
+    properties:
+      data_type:
+        type: string
+      data_value:
+        type: string
+      device_type:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      recorded_timestamp:
+        type: string
+    type: object
+  user.FilterUsers:
+    properties:
+      created_at:
+        type: string
+      date_of_birth:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      gender:
+        type: string
+      last_name:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -49,117 +324,555 @@ info:
   title: Api Getaway
   version: "1.0"
 paths:
-  /api/users/{:email}:
+  /api/health/generate:
+    post:
+      consumes:
+      - application/json
+      description: Generates health recommendations for a user
+      parameters:
+      - description: Request body for generating health recommendations
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/health.GenerateHealthRecommendationsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid data
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Generate health recommendations
+      tags:
+      - HealthCheck
+  /api/health/getDailyHealthSummary/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Retrieves the daily health summary for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request body for getting daily health summary
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetDailyHealthSummaryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/health.GetDailyHealthSummaryRes'
+        "400":
+          description: Invalid request parameters
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get daily health summary
+      tags:
+      - HealthCheck
+  /api/health/getRealtimeHealthMonitoring/{user_id}:
     get:
       consumes:
       - application/json
-      description: Get user by Email for admin
+      description: Retrieves real-time health monitoring data for a user
       parameters:
-      - description: user email
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.GetRealtimeHealthMonitoringRes'
+        "400":
+          description: Invalid request parameters
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get real-time health monitoring data
+      tags:
+      - HealthCheck
+  /api/health/weekly/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Retrieves the weekly health summary for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request body for weekly health summary
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/health.GetWeeklyHealthSummaryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/health.GetWeeklyHealthSummaryRes'
+        "400":
+          description: Invalid request parameters
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get weekly health summary
+      tags:
+      - HealthCheck
+  /api/lifestyle/addLifestyleData:
+    post:
+      consumes:
+      - application/json
+      description: Adds lifestyle data for a user
+      parameters:
+      - description: Request body for adding lifestyle data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/health.AddLifeStyleDataReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.Success'
+        "400":
+          description: Invalid request parameters
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Add lifestyle data
+      tags:
+      - Lifestyle
+  /api/lifestyle/deleteLifestyleData/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a specific lifestyle data entry by its ID
+      parameters:
+      - description: Data ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete lifestyle data
+      tags:
+      - Lifestyle
+  /api/lifestyle/getAllLifestyleData/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves lifestyle data for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.GetLifeStyle'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get lifestyle data
+      tags:
+      - Lifestyle
+  /api/lifestyle/getLifestyleById/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves lifestyle data for a specific entry by its ID
+      parameters:
+      - description: Data ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/health.GetLifeStyleDataByIdRes'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get lifestyle data by ID
+      tags:
+      - Lifestyle
+  /api/lifestyle/updateLifestyleData:
+    put:
+      consumes:
+      - application/json
+      description: Updates a specific lifestyle data entry
+      parameters:
+      - description: Request body for updating lifestyle data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/health.UpdateLifeStyleDataReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.Success'
+        "400":
+          description: Invalid request parameters
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Update lifestyle data
+      tags:
+      - Lifestyle
+  /api/medicalReport/add:
+    post:
+      description: Adds a medical report for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request body for adding a medical report
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/health.AddMedicalReportReq'
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.Success'
+        "400":
+          description: Invalid request parameters
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Add medical report
+      tags:
+      - MedicalReport
+  /api/medicalReport/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a specific medical report by its ID
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete medical report
+      tags:
+      - MedicalReport
+  /api/medicalReport/get/{user_id}:
+    get:
+      description: Retrieves all medical reports for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.MedicalReport'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get medical reports
+      tags:
+      - MedicalReport
+  /api/medicalReport/getById/{id}:
+    get:
+      description: Retrieves a specific medical report by its ID
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/health.GetMedicalReportByIdRes'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get medical report by ID
+      tags:
+      - MedicalReport
+  /api/medicalReport/update:
+    put:
+      consumes:
+      - application/json
+      description: Updates a specific medical report
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request body for updating a medical report
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/health.UpdateMedicalReportReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.Success'
+        "400":
+          description: Invalid request parameters
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Update medical report
+      tags:
+      - MedicalReport
+  /api/user/email/{email}:
+    get:
+      description: Retrieves a user’s information by their email address
+      parameters:
+      - description: User Email
         in: path
         name: email
         required: true
         type: string
-      produces:
-      - application/json
       responses:
         "200":
-          description: OK
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/user.FilterUsers'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user by email
+      tags:
+      - User
+  /api/user/profile/{id}:
+    get:
+      description: Retrieves the profile information of a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Successful operation
           schema:
             $ref: '#/definitions/models.GetProfileRes'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Error'
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             $ref: '#/definitions/models.Error'
-      summary: Get User By Email
+      security:
+      - ApiKeyAuth: []
+      summary: Get user profile
       tags:
       - User
-  /api/users/{:id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete user by token
-      parameters:
-      - description: user id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-          schema:
-            $ref: '#/definitions/models.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Error'
-      summary: Delete User
-      tags:
-      - User
+  /api/user/updateUser/{id}:
     put:
-      consumes:
-      - application/json
-      description: Update user by id for admin
+      description: Updates the profile information of a user
       parameters:
-      - description: user id
+      - description: User ID
         in: path
         name: id
         required: true
         type: string
-      - description: Update user request
+      - description: Request body for updating user profile
         in: body
-        name: UpdateUser
+        name: body
         required: true
         schema:
           $ref: '#/definitions/models.UpdateProfileReq'
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.Success'
+        "400":
+          description: Invalid request parameters
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Update user profile
+      tags:
+      - User
+  /api/wearable/add:
+    post:
+      consumes:
+      - application/json
+      description: Adds wearable data for a user
+      parameters:
+      - description: Request body for adding wearable data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/health.AddWearableDataReq'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successful operation
           schema:
-            $ref: '#/definitions/models.Update'
+            $ref: '#/definitions/models.Success'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Error'
-        "404":
-          description: Not Found
+          description: Invalid request parameters
           schema:
             $ref: '#/definitions/models.Error'
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             $ref: '#/definitions/models.Error'
-      summary: Update User By ID
+      security:
+      - ApiKeyAuth: []
+      summary: Add wearable data
       tags:
-      - User
-  /users/getUserProfile/{:id}:
-    get:
+      - WearableData
+  /api/wearable/delete/{id}:
+    delete:
       consumes:
       - application/json
-      description: Get all users for admin
+      description: Deletes a specific wearable data entry by its ID
       parameters:
-      - description: user id
+      - description: Wearable Data ID
         in: path
         name: id
         required: true
@@ -168,27 +881,109 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successful operation
           schema:
-            $ref: '#/definitions/models.GetProfileRes'
-        "400":
-          description: Bad Request
+            $ref: '#/definitions/models.Success'
+        "500":
+          description: Internal server error
           schema:
             $ref: '#/definitions/models.Error'
-        "404":
-          description: Not Found
+      security:
+      - ApiKeyAuth: []
+      summary: Delete wearable data
+      tags:
+      - WearableData
+  /api/wearable/get/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all wearable data for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.Warable'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get wearable data
+      tags:
+      - WearableData
+  /api/wearable/getById/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific wearable data entry by its ID
+      parameters:
+      - description: Wearable Data ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/health.GetWearableDataByIdRes'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get wearable data by ID
+      tags:
+      - WearableData
+  /api/wearable/update:
+    put:
+      consumes:
+      - application/json
+      description: Updates a specific wearable data entry
+      parameters:
+      - description: Wearable Data ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request body for updating wearable data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/health.UpdateWearableDataReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.Success'
+        "400":
+          description: Invalid request parameters
           schema:
             $ref: '#/definitions/models.Error'
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             $ref: '#/definitions/models.Error'
-      summary: Get All Users
+      security:
+      - ApiKeyAuth: []
+      summary: Update wearable data
       tags:
-      - User
-securityDefinitions:
-  ApiKeyAuth:
-    in: header
-    name: Authorization
-    type: apiKey
+      - WearableData
+schemes:
+- http
 swagger: "2.0"

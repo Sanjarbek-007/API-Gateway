@@ -16,10 +16,10 @@ import (
 // @Tags MedicalReport
 // @Param id path string true "User ID"
 // @Param body body health.AddMedicalReportReq true "Request body for adding a medical report"
-// @Success 200 {object} health.AddMedicalReportResp "Successful operation"
+// @Success 200 {object} models.Success "Successful operation"
 // @Failure 400 {object} models.Error "Invalid request parameters"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /medical/report/{id} [post]
+// @Router /api/medicalReport/add [post]
 func (h *Handler) AddMedicalReport(ctx *gin.Context) {
 	var record health.AddMedicalReportReq
 
@@ -30,14 +30,14 @@ func (h *Handler) AddMedicalReport(ctx *gin.Context) {
 	}
 	id := ctx.Param("id")
 
-	resp, err := h.Mecdical.AddMedicalReport(ctx, &health.AddMedicalReportReq{UserId: id, RecordType: record.RecordType, RecordDate: record.RecordDate, Description: record.Description, DoctorId: record.DoctorId, Attachments: record.Attachments})
+	_, err := h.Mecdical.AddMedicalReport(ctx, &health.AddMedicalReportReq{UserId: id, RecordType: record.RecordType, RecordDate: record.RecordDate, Description: record.Description, DoctorId: record.DoctorId, Attachments: record.Attachments})
 	if err != nil {
 		h.Logger.Error("Error Adding user medical record: ", "error", err)
 		ctx.JSON(500, models.Error{Message: "Internal server error"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, models.Success{Message: "Medical report added successfully"})
 }
 
 
@@ -47,9 +47,9 @@ func (h *Handler) AddMedicalReport(ctx *gin.Context) {
 // @Description Retrieves all medical reports for a user
 // @Tags MedicalReport
 // @Param user_id path string true "User ID"
-// @Success 200 {object} health.GetMedicalReportResp "Successful operation"
+// @Success 200 {object} models.MedicalReport "Successful operation"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /medical/report/{user_id} [get]
+// @Router /api/medicalReport/get/{user_id} [get]
 func (h *Handler) GetMedicalReport(ctx *gin.Context) {
 	id := ctx.Param("user_id")
 
@@ -81,9 +81,9 @@ func (h *Handler) GetMedicalReport(ctx *gin.Context) {
 // @Description Retrieves a specific medical report by its ID
 // @Tags MedicalReport
 // @Param id path string true "Report ID"
-// @Success 200 {object} health.GetMedicalReportByIdResp "Successful operation"
+// @Success 200 {object} health.GetMedicalReportByIdRes "Successful operation"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /medical/report/id/{id} [get]
+// @Router /api/medicalReport/getById/{id} [get]
 func (h *Handler) GetMedicalReportById(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -103,12 +103,14 @@ func (h *Handler) GetMedicalReportById(ctx *gin.Context) {
 // @Summary Update medical report
 // @Description Updates a specific medical report
 // @Tags MedicalReport
+// @Accept       json
+// @Produce      json
 // @Param id path string true "Report ID"
 // @Param body body health.UpdateMedicalReportReq true "Request body for updating a medical report"
-// @Success 200 {object} health.UpdateMedicalReportResp "Successful operation"
+// @Success 200 {object} models.Success "Successful operation"
 // @Failure 400 {object} models.Error "Invalid request parameters"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /medical/report/{id} [put]
+// @Router /api/medicalReport/update [put]
 func (h *Handler) UpdateMedicalReport(ctx *gin.Context) {
 	var record health.UpdateMedicalReportReq
 
@@ -119,14 +121,14 @@ func (h *Handler) UpdateMedicalReport(ctx *gin.Context) {
     }
     id := ctx.Param("id")
 
-    resp, err := h.Mecdical.UpdateMedicalReport(ctx, &health.UpdateMedicalReportReq{Id: id, RecordType: record.RecordType, Description: record.Description, DoctorId: record.DoctorId, Attachments: record.Attachments})
+    _, err := h.Mecdical.UpdateMedicalReport(ctx, &health.UpdateMedicalReportReq{Id: id, RecordType: record.RecordType, Description: record.Description, DoctorId: record.DoctorId, Attachments: record.Attachments})
     if err!= nil {
         h.Logger.Error("Error Updating user medical record: ", "error", err)
         ctx.JSON(500, models.Error{Message: "Internal server error"})
         return
 	}
 
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, models.Success{Message: "Medical report updated successfully"})
 }
 
 
@@ -135,19 +137,21 @@ func (h *Handler) UpdateMedicalReport(ctx *gin.Context) {
 // @Summary Delete medical report
 // @Description Deletes a specific medical report by its ID
 // @Tags MedicalReport
+// @Accept       json
+// @Produce      json
 // @Param id path string true "Report ID"
-// @Success 200 {object} health.DeleteMedicalReportResp "Successful operation"
+// @Success 200 {object} models.Success "Successful operation"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /medical/report/{id} [delete]
+// @Router /api/medicalReport/delete/{id} [delete]
 func (h *Handler) DeleteMedicalReport(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-    resp, err := h.Mecdical.DeleteMedicalReport(ctx, &health.DeleteMedicalReportReq{Id: id})
+    _, err := h.Mecdical.DeleteMedicalReport(ctx, &health.DeleteMedicalReportReq{Id: id})
     if err!= nil {
         h.Logger.Error("Error deleting user medical record: ", "error", err)
         ctx.JSON(500, models.Error{Message: "Internal server error"})
         return
     }
 
-    ctx.JSON(http.StatusOK, resp)
+    ctx.JSON(http.StatusOK, models.Success{Message: "Medical report deleted successfully"})
 }

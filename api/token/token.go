@@ -1,57 +1,69 @@
-package token
+package tokenn
 
 import (
-	"api-gateway/config"
+	"errors"
+	"fmt"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
-type Claims struct {
-	Username string `json:"username"`
-	ID       string `json:"id"`
-	Role     string `json:"role"`
-	jwt.StandardClaims
+const (
+	signingkey = "key"
+)
+
+func ValidateAccessToken(accessTokenString string) (jwt.MapClaims, error) {
+    token, err := jwt.Parse(accessTokenString, func(token *jwt.Token) (interface{}, error) {
+        return []byte(signingkey), nil
+    })
+    if err != nil {
+        return nil, err
+    }
+
+    if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+        return claims, nil
+    }
+
+    return nil, errors.New("invalid token")
 }
 
-func ExtractClaims(tokenString string) (*Claims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(config.Load().ACCESS_TOKEN), nil
+
+func ExtractAccessClaim(tokenStr string) (*jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+		return []byte(signingkey), nil
 	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	if !token.Valid {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !(ok && token.Valid) {
 		return nil, err
 	}
 
-	claims, ok := token.Claims.(*Claims)
-	if !ok {
-		return nil, err
-	}
-
-	return claims, nil
+	return &claims, nil
 }
 
-func TokenValid(tokenString string) bool {
-	_, err := ExtractClaims(tokenString)
-	return err == nil
-}
+func GetUserInfoFromAccessToken(accessTokenString string) (string, string, error) {
+    refreshToken, err := jwt.Parse(accessTokenString, func(token *jwt.Token) (interface{}, error) { return []byte(signingkey), nil })
+    if err != nil || !refreshToken.Valid {
+        return "", "", err
+    }
+    claims, ok := refreshToken.Claims.(jwt.MapClaims)
+    if !ok {
+        return "", "", errors.New("invalid claims")
+    }
+    fmt.Println("Claims:", claims)
+    userID, userIDOk := claims["user_id"].(string)
+    role, roleOk := claims["role"].(string)
+	if !userIDOk ||!roleOk {
+        return "", "", errors.New("invalid claim types")
+    }
 
-func GetUserId(tokenStr string) string {
-	claims, err := ExtractClaims(tokenStr)
-	if err == nil {
-		return claims.ID
-	}
-	return ""
-}
+    if !userIDOk || !roleOk {
+        return "", "", errors.New("invalid claim types")
+    }
 
-func GetRole(tokenStr string) string {
-	claims, err := ExtractClaims(tokenStr)
-	if err == nil {
-		return claims.Role
-	}
-	return ""
+    return userID, role, nil
 }
 

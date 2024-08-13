@@ -37,6 +37,11 @@ type GetRealtimeHealthMonitoringRes struct {
 	Priority           int32  `json:"priority"`
 }
 
+type GetDailyHealthSummaryReq struct {
+	UserId      string `json:"user_id"`
+	Date        string `json:"date"`
+}
+
 type GetLifeStyle struct {
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`

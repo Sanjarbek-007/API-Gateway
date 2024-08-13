@@ -2,11 +2,10 @@ package api
 
 import (
 	"api-gateway/api/handler"
-	middleware "api-gateway/api/middlerware"
+	// middleware "api-gateway/api/middlerware"
 	"api-gateway/config"
 	"log/slog"
 
-	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 
 	_ "api-gateway/api/docs"
@@ -16,7 +15,7 @@ import (
 )
 
 type Controller interface {
-	SetupRoutes(handler.Handler, *slog.Logger, *casbin.Enforcer)
+	SetupRoutes(handler.Handler, *slog.Logger)
 	StartServer(config.Config) error
 }
 
@@ -38,23 +37,55 @@ func (c *controllerImpl) StartServer(cfg config.Config) error {
 // @version 1.0
 // @description api gateway service
 // @host localhost:8080
-// @securityDefinitions.apiKey ApiKeyAuth
-// @in header
-// @name Authorization
 // @BasePath /
 // @schemes http
-func (c *controllerImpl) SetupRoutes(h handler.Handler, logger *slog.Logger, enforcer *casbin.Enforcer) {
+// SetupRoutes sets up the routes for the API.
+func (c *controllerImpl) SetupRoutes(h handler.Handler, logger *slog.Logger) {
+    c.Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	c.Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+    router := c.Router.Group("/api")
+    // router.Use(middleware.Check)
+    // router.Use(middleware.CheckPermissionMiddleware(enforcer))
 
-	router := c.Router.Group("/api")
-	router.Use(middleware.IsAuthenticated(), middleware.LogMiddleware(logger), middleware.Authorize(enforcer))
+    users := router.Group("/user")
+    {
+        users.GET("/profile/:id", h.GetUserProfile)
+        users.PUT("/updateUser/:id", h.UpdateUser)
+        users.GET("/email/:email", h.GetUserByEmail)
+    }
 
-	users := router.Group("/users")
-	{
-		users.GET("/getUserProfile/:id", h.GetUserProfile)
-		users.PUT("/updateUser/:id", h.UpdateUser)
-		users.GET("/getUserByEmail/:email", h.GetUserByEmail)
-		users.DELETE("/deleteUser/:id", h.DeleteUser)
-	}
+    health := router.Group("/health")
+    {
+        health.POST("/generate", h.GenerateHealthRecommendations)
+        health.GET("/getRealtimeHealthMonitoring/:user_id", h.GetRealtimeHealthMonitoring)
+        health.GET("/getDailyHealthSummary/:id", h.GetDailyHealthSummary)
+        health.GET("/getWeeklyHealthSummary/:id", h.GetWeeklyHealthSummary)
+    }
+
+    lifestyle := router.Group("/lifestyle")
+    {
+        lifestyle.POST("/addLifestyleData", h.AddLifeStyleData)
+        lifestyle.GET("/getAllLifestyleData/:user_id", h.GetLifeStyleData)
+        lifestyle.GET("/getLifestyleById/:id", h.GetLifeStyleDataById)
+        lifestyle.PUT("/updateLifestyleData", h.UpdateLifeStyleData)
+        lifestyle.DELETE("/deleteLifestyleData/:id", h.DeleteLifeStyleData)
+    }
+
+    medicalReport := router.Group("/medicalReport")
+    {
+        medicalReport.POST("/add", h.AddMedicalReport)
+        medicalReport.GET("/get/:user_id", h.GetMedicalReport)
+        medicalReport.GET("/getById/:id", h.GetMedicalReportById)
+        medicalReport.PUT("/update", h.UpdateMedicalReport)
+        medicalReport.DELETE("/delete/:id", h.DeleteMedicalReport)
+    }
+
+    wearable := router.Group("/wearable")
+    {
+        wearable.POST("/add", h.AddWearableData)
+        wearable.GET("/get/:user_id", h.GetWearableData)
+        wearable.GET("/getById/:id", h.GetWearableDataById)
+        wearable.PUT("/update", h.UpdateWearableData)
+        wearable.DELETE("/delete/:id", h.DeleteWearableData)
+    }
 }

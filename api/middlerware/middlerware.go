@@ -1,88 +1,108 @@
 package middleware
 
 import (
-	"api-gateway/api/token"
+	tokenn "api-gateway/api/token"
 	"fmt"
-	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
 
-func IsAuthenticated() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		tokenString, err := ctx.Cookie("access_token")
-		if err != nil {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"Error": "Authorization cookie not found",
-			})
-			ctx.Abort()
-			return
-		}
-
-		claims, err := token.ExtractClaims(tokenString)
-		if err != nil {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"Error": "Invalid token",
-			})
-			ctx.Abort()
-			return
-		}
-
-		ctx.Set("claims", claims)
-
-		ctx.Next()
-	}
+type casbinPermission struct {
+	enforcer *casbin.Enforcer
 }
 
-func Authorize(enforcer *casbin.Enforcer) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		claims, exists := ctx.Get("claims")
-		if !exists {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"Error": "Unauthorized",
-			})
-			ctx.Abort()
-			return
-		}
+func Check(c *gin.Context) {
+    authHeader := c.GetHeader("Authorization")
+    if authHeader == "" {
+        c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+            "error": "Authorization header is required",
+        })
+        return
+    }
 
-		userClaims := claims.(*token.Claims)
-		fmt.Println(userClaims.Role, ctx.FullPath(), ctx.Request.Method)
-		ok, err := enforcer.Enforce(userClaims.Role, ctx.FullPath(), ctx.Request.Method)
-		if err != nil {
-			fmt.Println(err)
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"Error": "Internal server error",
-				"Err": err.Error(),
-			})
-			ctx.Abort()
-			return
-		}
+    parts := strings.Split(authHeader, " ")
+	fmt.Println(parts[0])
+	fmt.Println(parts[1])
+    if len(parts) != 2 || parts[0] != "Bearer" {
+        c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+            "error": "Invalid authorization header format",
+        })
+        return
+    }
 
-		if !ok {
-			ctx.JSON(http.StatusForbidden, gin.H{
-				"Error": "Forbidden",
-			})
-			ctx.Abort()
-			return
-		}
-
-		ctx.Next()
-	}
+    accessToken := parts[1]
+    _, err := tokenn.ValidateAccessToken(accessToken)
+    if err != nil {
+        c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+            "error": "Invalid token provided",
+        })
+        return
+    }
+    c.Next()
 }
 
-func LogMiddleware(logger *slog.Logger) gin.HandlerFunc {
+
+func (casb *casbinPermission) GetRole(c *gin.Context) (string, int) {
+    authHeader := c.GetHeader("Authorization")
+    if authHeader == "" {
+        return "unauthorized", http.StatusUnauthorized
+    }
+
+    parts := strings.Split(authHeader, " ")
+    if len(parts) != 2 || parts[0] != "Bearer" {
+        return "unauthorized", http.StatusUnauthorized
+    }
+
+    token := parts[1]
+    _, role, err := tokenn.GetUserInfoFromAccessToken(token)
+    if err != nil {
+        return "error while reading role", 500
+    }
+
+    return role, 0
+}
+
+
+func (casb *casbinPermission) CheckPermission(c *gin.Context) (bool, error) {
+    act := c.Request.Method
+    sub, status := casb.GetRole(c)
+    if status != 0 {
+        return false, fmt.Errorf("failed to get role: %s", sub)
+    }
+    obj := c.FullPath()
+
+    ok, err := casb.enforcer.Enforce(sub, obj, act)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "Error": "Internal server error",
+        })
+        c.Abort()
+        return false, err
+    }
+    return ok, nil
+}
+
+
+func CheckPermissionMiddleware(enf *casbin.Enforcer) gin.HandlerFunc {
+	casbHandler := &casbinPermission{
+		enforcer: enf,
+	}
+
 	return func(c *gin.Context) {
-		logger.Info("Request received",
-			slog.String("method", c.Request.Method),
-			slog.String("path", c.Request.URL.Path),
-		)
+		result, err := casbHandler.CheckPermission(c)
+
+		if err != nil {
+			c.AbortWithError(500, err)
+		}
+		if !result {
+			c.AbortWithStatusJSON(401, gin.H{
+				"message": "Forbidden",
+			})
+		}
 
 		c.Next()
-
-		logger.Info("Response sent",
-			slog.Int("status", c.Writer.Status()),
-		)
 	}
 }

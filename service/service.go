@@ -46,27 +46,28 @@ func (s *serviceManagerImpl) WearableService() health.WearableClient {
 }
 
 func NewServiceManager() (ServiceManager, error) {
-	connUser, err := grpc.NewClient(
-		config.Load().GRPC_USER_PORT,
+	connUser, err := grpc.Dial(
+		"127.0.0.1:"+config.Load().GRPC_USER_PORT,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
-	if err!= nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-	connHealth, err := grpc.NewClient(
-		config.Load().GRPC_PRODUCT_PORT,
-        grpc.WithTransportCredentials(insecure.NewCredentials()),
+	connHealth, err := grpc.Dial(
+		"127.0.0.1:"+config.Load().GRPC_PRODUCT_PORT,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
-	if err!= nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
 	return &serviceManagerImpl{
-		userClient:    user.NewUsersClient(connUser),
-        healthClient:   health.NewHealthCheckClient(connHealth),
-        lifeStyleClient: health.NewLifeStyleClient(connHealth),
-        medicalRecordClient: health.NewMedicalRecordClient(connHealth),
-        werableClient: health.NewWearableClient(connHealth),
+		userClient:         user.NewUsersClient(connUser),
+		healthClient:       health.NewHealthCheckClient(connHealth),
+		lifeStyleClient:    health.NewLifeStyleClient(connHealth),
+		medicalRecordClient: health.NewMedicalRecordClient(connHealth),
+		werableClient:      health.NewWearableClient(connHealth),
 	}, nil
 }
+
