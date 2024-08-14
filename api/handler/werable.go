@@ -77,7 +77,7 @@ func (h *Handler) AddWearableData(ctx *gin.Context) {
 // @Produce      json
 // @Success 200 {object} models.Warable "Successful operation"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /api/wearable/get/{user_id} [get]
+// @Router /api/wearable/get [get]
 func (h *Handler) GetWearableData(ctx *gin.Context) {
 	userID, exists := ctx.Get("user_id")
 	if !exists {
@@ -90,13 +90,15 @@ func (h *Handler) GetWearableData(ctx *gin.Context) {
 
 	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
 	if err != nil {
+		fmt.Println(err, "------------------------")
 		h.Logger.Error("Error getting user profile: ", "error", err)
 		ctx.JSON(500, models.Error{Message: err.Error()})
 		return
 	}
-
+	fmt.Println(user.FirstName, user.LastName)
 	resp, err := h.Wearable.GetWearableData(ctx, &health.GetWearableDataReq{UserId: id, FirstName: user.FirstName, LastName: user.LastName})
 	if err != nil {
+		fmt.Println(err, "+++++++++++++++++++++++++++++++++++")
 		h.Logger.Error("Error Get Medical record Style: ", "error", err)
 		ctx.JSON(500, models.Error{Message: err.Error()})
 		return

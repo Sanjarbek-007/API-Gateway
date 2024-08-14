@@ -103,32 +103,32 @@ func CasbinEnforcer(logger *slog.Logger) (*casbin.Enforcer, error) {
 		
 	    //medical report
 		{"admin", "/api/medicalReport/add", "POST"},
-		{"admin", "/api/medicalReport/get/:user_id", "GET"},
+		{"admin", "/api/medicalReport/get", "GET"},
         {"admin", "/api/medicalReport/getById/:id", "GET"},
         {"admin", "/api/medicalReport/update", "PUT"},
         {"admin", "/api/medicalReport/delete/:id", "DELETE"},
 
 		{"patient", "/api/medicalReport/add", "POST"},
-		{"patient", "/api/medicalReport/get/:user_id", "GET"},
+		{"patient", "/api/medicalReport/get", "GET"},
 
 		{"doctor", "/api/medicalReport/add", "POST"},
-		{"doctor", "/api/medicalReport/get/:user_id", "GET"},
+		{"doctor", "/api/medicalReport/get", "GET"},
         {"doctor", "/api/medicalReport/getById/:id", "GET"},
         {"doctor", "/api/medicalReport/update", "PUT"},
         {"doctor", "/api/medicalReport/delete/:id", "DELETE"},
 
 		//wearable
 		{"admin", "/api/wearable/add", "POST"},
-        {"admin", "/api/get/get/:user_id", "GET"},
+        {"admin", "/api/get/get", "GET"},
         {"admin", "/api/wearable/getById/:id", "GET"},
         {"admin", "/api/wearable/update", "PUT"},
         {"admin", "/api/wearable/delete/:id", "DELETE"},
 
 		{"patient", "/api/wearable/add", "POST"},
-        {"patient", "/api/get/get/:user_id", "GET"},
+        {"patient", "/api/get/get", "GET"},
 
 		{"doctor", "/api/wearable/add", "POST"},
-        {"doctor", "/api/wearable/get/:user_id", "GET"},
+        {"doctor", "/api/wearable/get", "GET"},
         {"doctor", "/api/wearable/getById/:id", "GET"},
         {"doctor", "/api/wearable/update", "PUT"},
         {"doctor", "/api/wearable/delete/:id", "DELETE"},

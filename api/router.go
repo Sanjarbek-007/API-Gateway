@@ -74,7 +74,7 @@ func (c *controllerImpl) SetupRoutes(h handler.Handler, logger *slog.Logger) {
     medicalReport := router.Group("/medicalReport")
     {
         medicalReport.POST("/add", h.AddMedicalReport)
-        medicalReport.GET("/get/:user_id", h.GetMedicalReport)
+        medicalReport.GET("/get", h.GetMedicalReport)
         medicalReport.GET("/getById/:id", h.GetMedicalReportById)
         medicalReport.PUT("/update", h.UpdateMedicalReport)
         medicalReport.DELETE("/delete/:id", h.DeleteMedicalReport)
@@ -83,7 +83,7 @@ func (c *controllerImpl) SetupRoutes(h handler.Handler, logger *slog.Logger) {
     wearable := router.Group("/wearable")
     {
         wearable.POST("/add", h.AddWearableData)
-        wearable.GET("/get/:user_id", h.GetWearableData)
+        wearable.GET("/get", h.GetWearableData)
         wearable.GET("/getById/:id", h.GetWearableDataById)
         wearable.PUT("/update", h.UpdateWearableData)
         wearable.DELETE("/delete/:id", h.DeleteWearableData)

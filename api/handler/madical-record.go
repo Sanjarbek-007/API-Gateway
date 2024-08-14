@@ -40,7 +40,7 @@ func (h *Handler) AddMedicalReport(ctx *gin.Context) {
 	}
 
 	kajkareq := user.CreateNotificationsReq{UserId: record.UserId, Message: fmt.Sprintf("You have added a new medical report for %s", time.Now().String())}
-	writerKafka, err := kafka.NewKafkaProducerInit([]string{"localhost:9092"})
+	writerKafka, err := kafka.NewKafkaProducerInit([]string{"kafka:9092"})
 	if err != nil {
 		h.Logger.Error("Error initializing Kafka producer", "error", err)
 		ctx.JSON(http.StatusInternalServerError, models.Error{Message: err.Error()})
@@ -72,16 +72,19 @@ func (h *Handler) AddMedicalReport(ctx *gin.Context) {
 // @Summary Get medical reports
 // @Description Retrieves all medical reports for a user
 // @Tags MedicalReport
-// @Success 200 {object} models.MedicalReport "Successful operation"
+// @Success 200 {object} health.GetMedicalReportRes "Successful operation"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /api/medicalReport/get/{user_id} [get]
+// @Router /api/medicalReport/get [get]
 func (h *Handler) GetMedicalReport(ctx *gin.Context) {
+	fmt.Println("Helllllllllllllllllllllllllllllllllllllllllllllollllllllllllllllllllllllllllllllllllllll")
 	userId, exists := ctx.Get("user_id")
 	if !exists {
 		ctx.JSON(http.StatusUnauthorized, models.Error{Message: "User ID not found in token"})
 		return
 	}
 	id := userId.(string)
+	fmt.Println("Helllllllllllllllllllllllllllllllllllllllllllllollllllllllllllllllllllllllllllllllllllll")
+	fmt.Println(id)
 
 	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
 	if err != nil {

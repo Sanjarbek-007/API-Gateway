@@ -530,7 +530,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/medicalReport/get/{user_id}": {
+        "/api/medicalReport/get": {
             "get": {
                 "security": [
                     {
@@ -546,7 +546,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Successful operation",
                         "schema": {
-                            "$ref": "#/definitions/models.MedicalReport"
+                            "$ref": "#/definitions/health.GetMedicalReportRes"
                         }
                     },
                     "500": {
@@ -934,7 +934,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/wearable/get/{user_id}": {
+        "/api/wearable/get": {
             "get": {
                 "security": [
                     {
@@ -1214,6 +1214,17 @@ const docTemplate = `{
                 }
             }
         },
+        "health.GetMedicalReportRes": {
+            "type": "object",
+            "properties": {
+                "medical_report": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/health.MedicalReport"
+                    }
+                }
+            }
+        },
         "health.GetWearableDataByIdRes": {
             "type": "object",
             "properties": {
@@ -1249,6 +1260,38 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "recommendation_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "health.MedicalReport": {
+            "type": "object",
+            "properties": {
+                "attachments": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "doctor_id": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "record_date": {
+                    "type": "string"
+                },
+                "record_type": {
                     "type": "string"
                 }
             }
@@ -1397,35 +1440,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "recommendation_type": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.MedicalReport": {
-            "type": "object",
-            "properties": {
-                "attachments": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "description": {
-                    "type": "string"
-                },
-                "doctor_name": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "record_type": {
-                    "type": "string"
-                },
-                "recorded_date": {
                     "type": "string"
                 }
             }
