@@ -1,7 +1,6 @@
 package tokenn
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/dgrijalva/jwt-go"
@@ -11,21 +10,17 @@ const (
 	signingkey = "key"
 )
 
-func ValidateAccessToken(accessTokenString string) (jwt.MapClaims, error) {
-    token, err := jwt.Parse(accessTokenString, func(token *jwt.Token) (interface{}, error) {
-        return []byte(signingkey), nil
-    })
-    if err != nil {
-        return nil, err
-    }
-
-    if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-        return claims, nil
-    }
-
-    return nil, errors.New("invalid token")
+func ValidateAccessToken(tokenStr string) (bool, error) {
+	if tokenStr == "" {
+		return false, nil
+	}
+	
+	_, err := ExtractAccessClaim(tokenStr)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
-
 
 func ExtractAccessClaim(tokenStr string) (*jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
@@ -33,11 +28,13 @@ func ExtractAccessClaim(tokenStr string) (*jwt.MapClaims, error) {
 	})
 
 	if err != nil {
+		fmt.Println("ldshgfiuesrhgfvriser", err)
 		return nil, err
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !(ok && token.Valid) {
+		fmt.Println("Pasr", err)
 		return nil, err
 	}
 
@@ -45,25 +42,16 @@ func ExtractAccessClaim(tokenStr string) (*jwt.MapClaims, error) {
 }
 
 func GetUserInfoFromAccessToken(accessTokenString string) (string, string, error) {
-    refreshToken, err := jwt.Parse(accessTokenString, func(token *jwt.Token) (interface{}, error) { return []byte(signingkey), nil })
-    if err != nil || !refreshToken.Valid {
-        return "", "", err
-    }
-    claims, ok := refreshToken.Claims.(jwt.MapClaims)
-    if !ok {
-        return "", "", errors.New("invalid claims")
-    }
-    fmt.Println("Claims:", claims)
-    userID, userIDOk := claims["user_id"].(string)
-    role, roleOk := claims["role"].(string)
-	if !userIDOk ||!roleOk {
-        return "", "", errors.New("invalid claim types")
-    }
+	refreshToken, err := jwt.Parse(accessTokenString, func(token *jwt.Token) (interface{}, error) { return []byte(signingkey), nil })
+	if err != nil || !refreshToken.Valid {
+		return "", "", err
+	}
+	claims, ok := refreshToken.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", "", err
+	}
+	userID := claims["user_id"].(string)
+	Role := claims["role"].(string)
 
-    if !userIDOk || !roleOk {
-        return "", "", errors.New("invalid claim types")
-    }
-
-    return userID, role, nil
+	return userID, Role, nil
 }
-

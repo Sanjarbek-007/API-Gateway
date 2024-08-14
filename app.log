@@ -1,9 +1,9 @@
-time=2024-08-13T08:22:51.402+05:00 level=INFO msg="API Gateway started successfully!"
-time=2024-08-13T08:23:59.876+05:00 level=INFO msg="API Gateway started successfully!"
-time=2024-08-13T08:27:18.668+05:00 level=INFO msg="API Gateway started successfully!"
-time=2024-08-13T08:27:48.393+05:00 level=INFO msg="API Gateway started successfully!"
-time=2024-08-13T08:30:10.151+05:00 level=INFO msg="API Gateway started successfully!"
-time=2024-08-13T08:30:36.370+05:00 level=INFO msg="API Gateway started successfully!"
-time=2024-08-13T08:33:36.916+05:00 level=ERROR msg="Error getting user profile: " error="rpc error: code = Unimplemented desc = method GetUserById not implemented"
-time=2024-08-13T08:37:26.423+05:00 level=ERROR msg="Error Get user Wearable data: " error="rpc error: code = Unknown desc = mongo: no documents in result"
-time=2024-08-13T08:49:00.782+05:00 level=INFO msg="API Gateway started successfully!"
+time=2024-08-14T14:16:36.883+05:00 level=INFO msg="API Gateway started successfully!"
+time=2024-08-14T14:19:04.916+05:00 level=INFO msg="API Gateway started successfully!"
+time=2024-08-14T14:50:14.873+05:00 level=INFO msg="API Gateway started successfully!"
+time=2024-08-14T14:53:11.536+05:00 level=INFO msg="API Gateway started successfully!"
+time=2024-08-14T14:59:26.118+05:00 level=INFO msg="API Gateway started successfully!"
+time=2024-08-14T15:00:21.819+05:00 level=ERROR msg="Error binding JSON" error=EOF
+time=2024-08-14T15:00:46.893+05:00 level=ERROR msg="Error binding JSON" error=EOF
+time=2024-08-14T15:03:05.974+05:00 level=INFO msg="API Gateway started successfully!"
+time=2024-08-14T15:03:29.879+05:00 level=ERROR msg="Error getting daily health summary" error="rpc error: code = Unknown desc = mongo: no documents in result"

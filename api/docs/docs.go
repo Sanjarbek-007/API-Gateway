@@ -75,8 +75,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/health/getDailyHealthSummary/{id}": {
-            "post": {
+        "/api/health/getDailyHealthSummary/{date}": {
+            "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -96,19 +96,10 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
+                        "description": "Date in format YYYY-MM-DD",
+                        "name": "date",
+                        "in": "query",
                         "required": true
-                    },
-                    {
-                        "description": "Request body for getting daily health summary",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.GetDailyHealthSummaryReq"
-                        }
                     }
                 ],
                 "responses": {
@@ -151,15 +142,6 @@ const docTemplate = `{
                     "HealthCheck"
                 ],
                 "summary": "Get real-time health monitoring data",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -182,8 +164,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/health/weekly/{id}": {
-            "post": {
+        "/api/health/getWeeklyHealthSummary/{start_date}/{end_date}": {
+            "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -203,19 +185,17 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
+                        "description": "Date in format YYYY-MM-DD",
+                        "name": "start_date",
+                        "in": "query",
                         "required": true
                     },
                     {
-                        "description": "Request body for weekly health summary",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/health.GetWeeklyHealthSummaryReq"
-                        }
+                        "type": "string",
+                        "description": "Date in format YYYY-MM-DD",
+                        "name": "end_date",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -334,7 +314,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/lifestyle/getAllLifestyleData/{user_id}": {
+        "/api/lifestyle/getAllLifestyleData": {
             "get": {
                 "security": [
                     {
@@ -352,15 +332,6 @@ const docTemplate = `{
                     "Lifestyle"
                 ],
                 "summary": "Get lifestyle data",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -485,13 +456,6 @@ const docTemplate = `{
                 "summary": "Add medical report",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Request body for adding a medical report",
                         "name": "body",
                         "in": "body",
@@ -578,15 +542,6 @@ const docTemplate = `{
                     "MedicalReport"
                 ],
                 "summary": "Get medical reports",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -659,13 +614,6 @@ const docTemplate = `{
                 ],
                 "summary": "Update medical report",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Report ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "Request body for updating a medical report",
                         "name": "body",
@@ -824,6 +772,74 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/notifications": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "it will GetAllNotifications",
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "GetAllNotifications",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/user.GetNotificationsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/notifications/new": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "it will GetAndMarkNotificationAsRead",
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "GetAndMarkNotificationAsRead",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/user.GetAndMarkNotificationAsReadRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/wearable/add": {
             "post": {
                 "security": [
@@ -936,15 +952,6 @@ const docTemplate = `{
                     "WearableData"
                 ],
                 "summary": "Get wearable data",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -1004,7 +1011,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/wearable/update": {
+        "/api/wearable/update/": {
             "put": {
                 "security": [
                     {
@@ -1023,13 +1030,6 @@ const docTemplate = `{
                 ],
                 "summary": "Update wearable data",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Wearable Data ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "Request body for updating wearable data",
                         "name": "body",
@@ -1178,10 +1178,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "life_style": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/health.GetLifeStyleByIdRes"
-                    }
+                    "$ref": "#/definitions/health.GetLifeStyleByIdRes"
                 }
             }
         },
@@ -1198,9 +1195,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "doctor_id": {
-                    "type": "string"
-                },
-                "doctor_name": {
                     "type": "string"
                 },
                 "email": {
@@ -1224,30 +1218,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "get_warable_id": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/health.WearableById"
-                    }
-                }
-            }
-        },
-        "health.GetWeeklyHealthSummaryReq": {
-            "type": "object",
-            "properties": {
-                "end_date": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "start_date": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
+                    "$ref": "#/definitions/health.WearableById"
                 }
             }
         },
@@ -1363,17 +1334,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.GetDailyHealthSummaryReq": {
-            "type": "object",
-            "properties": {
-                "date": {
-                    "type": "string"
-                },
-                "user_id": {
                     "type": "string"
                 }
             }
@@ -1552,6 +1512,49 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "user.GetAndMarkNotificationAsReadRes": {
+            "type": "object",
+            "properties": {
+                "notifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/user.Notification"
+                    }
+                }
+            }
+        },
+        "user.GetNotificationsResponse": {
+            "type": "object",
+            "properties": {
+                "notifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/user.Notification"
+                    }
+                }
+            }
+        },
+        "user.Notification": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
@@ -1559,11 +1562,11 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
-	BasePath:         "/",
-	Schemes:          []string{"http"},
-	Title:            "Api Getaway",
-	Description:      "api gateway service",
+	Host:             "",
+	BasePath:         "",
+	Schemes:          []string{},
+	Title:            "Api Gateway",
+	Description:      "This is a sample server for Api-gateway Service",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

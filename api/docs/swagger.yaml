@@ -1,4 +1,3 @@
-basePath: /
 definitions:
   health.AddLifeStyleDataReq:
     properties:
@@ -74,9 +73,7 @@ definitions:
   health.GetLifeStyleDataByIdRes:
     properties:
       life_style:
-        items:
-          $ref: '#/definitions/health.GetLifeStyleByIdRes'
-        type: array
+        $ref: '#/definitions/health.GetLifeStyleByIdRes'
     type: object
   health.GetMedicalReportByIdRes:
     properties:
@@ -87,8 +84,6 @@ definitions:
       description:
         type: string
       doctor_id:
-        type: string
-      doctor_name:
         type: string
       email:
         type: string
@@ -104,22 +99,7 @@ definitions:
   health.GetWearableDataByIdRes:
     properties:
       get_warable_id:
-        items:
-          $ref: '#/definitions/health.WearableById'
-        type: array
-    type: object
-  health.GetWeeklyHealthSummaryReq:
-    properties:
-      end_date:
-        type: string
-      first_name:
-        type: string
-      last_name:
-        type: string
-      start_date:
-        type: string
-      user_id:
-        type: string
+        $ref: '#/definitions/health.WearableById'
     type: object
   health.GetWeeklyHealthSummaryRes:
     properties:
@@ -194,13 +174,6 @@ definitions:
   models.Error:
     properties:
       message:
-        type: string
-    type: object
-  models.GetDailyHealthSummaryReq:
-    properties:
-      date:
-        type: string
-      user_id:
         type: string
     type: object
   models.GetLifeStyle:
@@ -317,11 +290,33 @@ definitions:
       user_id:
         type: string
     type: object
-host: localhost:8080
+  user.GetAndMarkNotificationAsReadRes:
+    properties:
+      notifications:
+        items:
+          $ref: '#/definitions/user.Notification'
+        type: array
+    type: object
+  user.GetNotificationsResponse:
+    properties:
+      notifications:
+        items:
+          $ref: '#/definitions/user.Notification'
+        type: array
+    type: object
+  user.Notification:
+    properties:
+      id:
+        type: string
+      message:
+        type: string
+      user_id:
+        type: string
+    type: object
 info:
   contact: {}
-  description: api gateway service
-  title: Api Getaway
+  description: This is a sample server for Api-gateway Service
+  title: Api Gateway
   version: "1.0"
 paths:
   /api/health/generate:
@@ -362,23 +357,17 @@ paths:
       summary: Generate health recommendations
       tags:
       - HealthCheck
-  /api/health/getDailyHealthSummary/{id}:
-    post:
+  /api/health/getDailyHealthSummary/{date}:
+    get:
       consumes:
       - application/json
       description: Retrieves the daily health summary for a user
       parameters:
-      - description: User ID
-        in: path
-        name: id
+      - description: Date in format YYYY-MM-DD
+        in: query
+        name: date
         required: true
         type: string
-      - description: Request body for getting daily health summary
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.GetDailyHealthSummaryReq'
       produces:
       - application/json
       responses:
@@ -404,12 +393,6 @@ paths:
       consumes:
       - application/json
       description: Retrieves real-time health monitoring data for a user
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -430,23 +413,22 @@ paths:
       summary: Get real-time health monitoring data
       tags:
       - HealthCheck
-  /api/health/weekly/{id}:
-    post:
+  /api/health/getWeeklyHealthSummary/{start_date}/{end_date}:
+    get:
       consumes:
       - application/json
       description: Retrieves the weekly health summary for a user
       parameters:
-      - description: User ID
-        in: path
-        name: id
+      - description: Date in format YYYY-MM-DD
+        in: query
+        name: start_date
         required: true
         type: string
-      - description: Request body for weekly health summary
-        in: body
-        name: body
+      - description: Date in format YYYY-MM-DD
+        in: query
+        name: end_date
         required: true
-        schema:
-          $ref: '#/definitions/health.GetWeeklyHealthSummaryReq'
+        type: string
       produces:
       - application/json
       responses:
@@ -526,17 +508,11 @@ paths:
       summary: Delete lifestyle data
       tags:
       - Lifestyle
-  /api/lifestyle/getAllLifestyleData/{user_id}:
+  /api/lifestyle/getAllLifestyleData:
     get:
       consumes:
       - application/json
       description: Retrieves lifestyle data for a user
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -616,11 +592,6 @@ paths:
     post:
       description: Adds a medical report for a user
       parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
       - description: Request body for adding a medical report
         in: body
         name: body
@@ -675,12 +646,6 @@ paths:
   /api/medicalReport/get/{user_id}:
     get:
       description: Retrieves all medical reports for a user
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
       responses:
         "200":
           description: Successful operation
@@ -724,11 +689,6 @@ paths:
       - application/json
       description: Updates a specific medical report
       parameters:
-      - description: Report ID
-        in: path
-        name: id
-        required: true
-        type: string
       - description: Request body for updating a medical report
         in: body
         name: body
@@ -834,6 +794,48 @@ paths:
       summary: Update user profile
       tags:
       - User
+  /api/v1/notifications:
+    get:
+      description: it will GetAllNotifications
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.GetNotificationsResponse'
+        "400":
+          description: Invalid data
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: GetAllNotifications
+      tags:
+      - Notifications
+  /api/v1/notifications/new:
+    get:
+      description: it will GetAndMarkNotificationAsRead
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.GetAndMarkNotificationAsReadRes'
+        "400":
+          description: Invalid data
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: GetAndMarkNotificationAsRead
+      tags:
+      - Notifications
   /api/wearable/add:
     post:
       consumes:
@@ -898,12 +900,6 @@ paths:
       consumes:
       - application/json
       description: Retrieves all wearable data for a user
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -947,17 +943,12 @@ paths:
       summary: Get wearable data by ID
       tags:
       - WearableData
-  /api/wearable/update:
+  /api/wearable/update/:
     put:
       consumes:
       - application/json
       description: Updates a specific wearable data entry
       parameters:
-      - description: Wearable Data ID
-        in: path
-        name: id
-        required: true
-        type: string
       - description: Request body for updating wearable data
         in: body
         name: body
@@ -984,6 +975,9 @@ paths:
       summary: Update wearable data
       tags:
       - WearableData
-schemes:
-- http
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

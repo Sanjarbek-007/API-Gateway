@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	host     = "localhost"
+	host     = "postgres_container"
 	port     = "5432"
 	dbname   = "casbin"
 	username = "macbookpro"
@@ -19,10 +19,8 @@ const (
 )
 
 func CasbinEnforcer(logger *slog.Logger) (*casbin.Enforcer, error) {
-	// Creating the connection string
 	connStr := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable", host, port, username, dbname, password)
 	
-	// Open database connection to ensure it's reachable (optional)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		logger.Error("Error connecting to database", "error", err.Error())
@@ -30,14 +28,14 @@ func CasbinEnforcer(logger *slog.Logger) (*casbin.Enforcer, error) {
 	}
 	defer db.Close()
 
-	// Validate the database connection
 	err = db.Ping()
 	if err != nil {
 		logger.Error("Error pinging the database", "error", err.Error())
 		return nil, err
 	}
+	query := `DROP TABLE IF EXISTS "casbin_rule";`
+	db.Exec(query)
 
-	// Initialize the Casbin adapter and enforcer
 	adapter, err := xormadapter.NewAdapter("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable", host, port, username, dbname, password))
 	if err != nil {
 		logger.Error("Error creating Casbin adapter", "error", err.Error())
@@ -59,30 +57,81 @@ func CasbinEnforcer(logger *slog.Logger) (*casbin.Enforcer, error) {
 
 	// Add policies
 	policies := [][]string{
-		{"doctor", "/health/medical_recordsAdd", "POST"},
-		{"admin", "/health/medical_recordsAdd", "POST"},
-		{"doctor", "/health/medical_recordsGet/:id", "GET"},
-		{"admin", "/health/medical_recordsGet/:id", "GET"},
-		{"patient", "/health/medical_recordsGet/:id", "GET"},
-		{"doctor", "/health/medical_recordsUp", "PUT"},
-		{"admin", "/health/medical_recordsUp", "PUT"},
-		{"patient", "/health/medical_recordsUp", "PUT"},
-		{"admin", "/health/medical_recordsDel/:id", "DELETE"},
-		{"admin", "/health/medical_records/user/:userId", "GET"},
-		{"patient", "/health/lifestyleAdd", "POST"},
-		{"patient", "/api/lifestyle/getLifestyleById/:id", "GET"},
-		{"patient", "/health/lifestyleGet/:id", "GET"},
-		{"patient", "/health/lifestyleUp", "PUT"},
-		{"patient", "/health/lifestyleDel/:id", "DELETE"},
-		{"patient", "/health/wearable-dataAdd", "POST"},
-		{"patient", "/health/wearabledata/:limit/:page", "GET"},
-		{"patient", "/health/wearable-dataGet/:id", "GET"},
-		{"patient", "/health/wearable-dataUp", "PUT"},
-		{"patient", "/health/wearable-dataDel/:id", "DELETE"},
-		{"doctor", "/health/recommendationsAdd", "POST"},
-		{"patient", "/health/monitoring/:user_id/realtime", "GET"},
-		{"patient", "/health/summary/:user_id/daily/:date", "GET"},
-		{"patient", "/health/summary/:user_id/weekly/:start_date", "GET"},
+		//user
+		{"admin", "api/user/profile/:id", "GET"},
+		{"admin", "api/user/updateUser/:id", "PUT"},
+		{"admin", "api/user/email/:email", "GET"},
+
+		{"patient", "api/user/profile/:id", "GET"},
+		{"patient", "api/user/updateUser/:id", "PUT"},
+		{"patient", "api/user/email/:email", "GET"},
+
+		{"doctor", "api/user/profile/:id", "GET"},
+		{"doctor", "api/user/updateUser/:id", "PUT"},
+		{"doctor", "api/user/email/:email", "GET"},
+
+		//health
+		{"admin", "/api/health/generate", "POST"},
+		{"admin", "/api/health/getRealtimeHealthMonitoring/:user_id", "GET"},
+		{"admin", "/api/health/getDailyHealthSummary/:date", "GET"},
+        {"admin", "/api/health/getWeeklyHealthSummary/:start_date/:end_date", "GET"},
+
+		{"patient", "/api/health/getRealtimeHealthMonitoring/:user_id", "GET"},
+		{"patient", "/api/health/getDailyHealthSummary/:date", "GET"},
+        {"patient", "/api/health/getWeeklyHealthSummary/:start_date/:end_date", "GET"},
+
+		{"doctor", "/api/health/generate", "POST"},
+		{"doctor", "/api/health/getRealtimeHealthMonitoring/:user_id", "GET"},
+		{"doctor", "/api/health/getDailyHealthSummary/:date", "GET"},
+        {"doctor", "/api/health/getWeeklyHealthSummary/:start_date/:end_date", "GET"},
+
+		//lifestyle
+		{"admin", "/api/lifestyle/addLifestyleData", "POST"},
+		{"admin", "/api/lifestyle/getAllLifestyleData", "GET"},
+        {"admin", "/api/lifestyle/getLifestyleById/:id", "GET"},
+        {"admin", "/api/lifestyle/updateLifestyleData", "PUT"},
+		{"admin", "/api/lifestyle/deleteLifestyleData/:id", "DELETE"},
+
+		{"patient", "/api/lifestyle/addLifestyleData", "POST"},
+		{"patient", "/api/lifestyle/getAllLifestyleData", "GET"},
+
+		{"doctor", "/api/lifestyle/addLifestyleData", "POST"},
+		{"doctor", "/api/lifestyle/getAllLifestyleData", "GET"},
+        {"doctor", "/api/lifestyle/getLifestyleById/:id", "GET"},
+        {"doctor", "/api/lifestyle/updateLifestyleData", "PUT"},
+		{"doctor", "/api/lifestyle/deleteLifestyleData/:id", "DELETE"},
+		
+	    //medical report
+		{"admin", "/api/medicalReport/add", "POST"},
+		{"admin", "/api/medicalReport/get/:user_id", "GET"},
+        {"admin", "/api/medicalReport/getById/:id", "GET"},
+        {"admin", "/api/medicalReport/update", "PUT"},
+        {"admin", "/api/medicalReport/delete/:id", "DELETE"},
+
+		{"patient", "/api/medicalReport/add", "POST"},
+		{"patient", "/api/medicalReport/get/:user_id", "GET"},
+
+		{"doctor", "/api/medicalReport/add", "POST"},
+		{"doctor", "/api/medicalReport/get/:user_id", "GET"},
+        {"doctor", "/api/medicalReport/getById/:id", "GET"},
+        {"doctor", "/api/medicalReport/update", "PUT"},
+        {"doctor", "/api/medicalReport/delete/:id", "DELETE"},
+
+		//wearable
+		{"admin", "/api/wearable/add", "POST"},
+        {"admin", "/api/get/get/:user_id", "GET"},
+        {"admin", "/api/wearable/getById/:id", "GET"},
+        {"admin", "/api/wearable/update", "PUT"},
+        {"admin", "/api/wearable/delete/:id", "DELETE"},
+
+		{"patient", "/api/wearable/add", "POST"},
+        {"patient", "/api/get/get/:user_id", "GET"},
+
+		{"doctor", "/api/wearable/add", "POST"},
+        {"doctor", "/api/wearable/get/:user_id", "GET"},
+        {"doctor", "/api/wearable/getById/:id", "GET"},
+        {"doctor", "/api/wearable/update", "PUT"},
+        {"doctor", "/api/wearable/delete/:id", "DELETE"},
 	}
 
 	_, err = enforcer.AddPolicies(policies)
@@ -91,7 +140,6 @@ func CasbinEnforcer(logger *slog.Logger) (*casbin.Enforcer, error) {
 		return nil, err
 	}
 
-	// Save the policies to the database
 	err = enforcer.SavePolicy()
 	if err != nil {
 		logger.Error("Error saving Casbin policy", "error", err.Error())

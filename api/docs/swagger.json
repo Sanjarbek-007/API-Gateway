@@ -1,16 +1,11 @@
 {
-    "schemes": [
-        "http"
-    ],
     "swagger": "2.0",
     "info": {
-        "description": "api gateway service",
-        "title": "Api Getaway",
+        "description": "This is a sample server for Api-gateway Service",
+        "title": "Api Gateway",
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
-    "basePath": "/",
     "paths": {
         "/api/health/generate": {
             "post": {
@@ -72,8 +67,8 @@
                 }
             }
         },
-        "/api/health/getDailyHealthSummary/{id}": {
-            "post": {
+        "/api/health/getDailyHealthSummary/{date}": {
+            "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -93,19 +88,10 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
+                        "description": "Date in format YYYY-MM-DD",
+                        "name": "date",
+                        "in": "query",
                         "required": true
-                    },
-                    {
-                        "description": "Request body for getting daily health summary",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.GetDailyHealthSummaryReq"
-                        }
                     }
                 ],
                 "responses": {
@@ -148,15 +134,6 @@
                     "HealthCheck"
                 ],
                 "summary": "Get real-time health monitoring data",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -179,8 +156,8 @@
                 }
             }
         },
-        "/api/health/weekly/{id}": {
-            "post": {
+        "/api/health/getWeeklyHealthSummary/{start_date}/{end_date}": {
+            "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -200,19 +177,17 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
+                        "description": "Date in format YYYY-MM-DD",
+                        "name": "start_date",
+                        "in": "query",
                         "required": true
                     },
                     {
-                        "description": "Request body for weekly health summary",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/health.GetWeeklyHealthSummaryReq"
-                        }
+                        "type": "string",
+                        "description": "Date in format YYYY-MM-DD",
+                        "name": "end_date",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -331,7 +306,7 @@
                 }
             }
         },
-        "/api/lifestyle/getAllLifestyleData/{user_id}": {
+        "/api/lifestyle/getAllLifestyleData": {
             "get": {
                 "security": [
                     {
@@ -349,15 +324,6 @@
                     "Lifestyle"
                 ],
                 "summary": "Get lifestyle data",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -482,13 +448,6 @@
                 "summary": "Add medical report",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Request body for adding a medical report",
                         "name": "body",
                         "in": "body",
@@ -575,15 +534,6 @@
                     "MedicalReport"
                 ],
                 "summary": "Get medical reports",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -656,13 +606,6 @@
                 ],
                 "summary": "Update medical report",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Report ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "Request body for updating a medical report",
                         "name": "body",
@@ -821,6 +764,74 @@
                 }
             }
         },
+        "/api/v1/notifications": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "it will GetAllNotifications",
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "GetAllNotifications",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/user.GetNotificationsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/notifications/new": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "it will GetAndMarkNotificationAsRead",
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "GetAndMarkNotificationAsRead",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/user.GetAndMarkNotificationAsReadRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/wearable/add": {
             "post": {
                 "security": [
@@ -933,15 +944,6 @@
                     "WearableData"
                 ],
                 "summary": "Get wearable data",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -1001,7 +1003,7 @@
                 }
             }
         },
-        "/api/wearable/update": {
+        "/api/wearable/update/": {
             "put": {
                 "security": [
                     {
@@ -1020,13 +1022,6 @@
                 ],
                 "summary": "Update wearable data",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Wearable Data ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "Request body for updating wearable data",
                         "name": "body",
@@ -1175,10 +1170,7 @@
             "type": "object",
             "properties": {
                 "life_style": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/health.GetLifeStyleByIdRes"
-                    }
+                    "$ref": "#/definitions/health.GetLifeStyleByIdRes"
                 }
             }
         },
@@ -1195,9 +1187,6 @@
                     "type": "string"
                 },
                 "doctor_id": {
-                    "type": "string"
-                },
-                "doctor_name": {
                     "type": "string"
                 },
                 "email": {
@@ -1221,30 +1210,7 @@
             "type": "object",
             "properties": {
                 "get_warable_id": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/health.WearableById"
-                    }
-                }
-            }
-        },
-        "health.GetWeeklyHealthSummaryReq": {
-            "type": "object",
-            "properties": {
-                "end_date": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "start_date": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
+                    "$ref": "#/definitions/health.WearableById"
                 }
             }
         },
@@ -1360,17 +1326,6 @@
             "type": "object",
             "properties": {
                 "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.GetDailyHealthSummaryReq": {
-            "type": "object",
-            "properties": {
-                "date": {
-                    "type": "string"
-                },
-                "user_id": {
                     "type": "string"
                 }
             }
@@ -1549,6 +1504,49 @@
                     "type": "string"
                 }
             }
+        },
+        "user.GetAndMarkNotificationAsReadRes": {
+            "type": "object",
+            "properties": {
+                "notifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/user.Notification"
+                    }
+                }
+            }
+        },
+        "user.GetNotificationsResponse": {
+            "type": "object",
+            "properties": {
+                "notifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/user.Notification"
+                    }
+                }
+            }
+        },
+        "user.Notification": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

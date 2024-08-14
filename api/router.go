@@ -1,51 +1,51 @@
 package api
 
 import (
-	"api-gateway/api/handler"
-	// middleware "api-gateway/api/middlerware"
-	"api-gateway/config"
-	"log/slog"
+ "api-gateway/api/handler"
+ middleware "api-gateway/api/middlerware"
+ "api-gateway/config"
+ "log/slog"
 
-	"github.com/gin-gonic/gin"
+ "github.com/gin-gonic/gin"
 
-	_ "api-gateway/api/docs"
+ _ "api-gateway/api/docs"
 
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
+ swaggerFiles "github.com/swaggo/files"
+ ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Controller interface {
-	SetupRoutes(handler.Handler, *slog.Logger)
-	StartServer(config.Config) error
+ SetupRoutes(handler.Handler, *slog.Logger)
+ StartServer(config.Config) error
 }
 
 type controllerImpl struct {
-	Port   string
-	Router *gin.Engine
+ Port   string
+ Router *gin.Engine
 }
 
 func NewController(router *gin.Engine) Controller {
-	return &controllerImpl{Router: router}
+ return &controllerImpl{Router: router}
 }
 
 func (c *controllerImpl) StartServer(cfg config.Config) error {
-	c.Port = cfg.HTTP_PORT
-	return c.Router.Run(c.Port)
+ c.Port = cfg.HTTP_PORT
+ return c.Router.Run(c.Port)
 }
-
-// @title Api Getaway
+// @title Api Gateway
 // @version 1.0
-// @description api gateway service
-// @host localhost:8080
-// @BasePath /
+// @description This is a sample server for Api-gateway Service
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @BasePath /api/v1
 // @schemes http
-// SetupRoutes sets up the routes for the API.
 func (c *controllerImpl) SetupRoutes(h handler.Handler, logger *slog.Logger) {
     c.Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
     router := c.Router.Group("/api")
-    // router.Use(middleware.Check)
-    // router.Use(middleware.CheckPermissionMiddleware(enforcer))
+    router.Use(middleware.Check)
+    router.Use(middleware.CheckPermissionMiddleware(h.Enforcer))
 
     users := router.Group("/user")
     {
@@ -58,14 +58,14 @@ func (c *controllerImpl) SetupRoutes(h handler.Handler, logger *slog.Logger) {
     {
         health.POST("/generate", h.GenerateHealthRecommendations)
         health.GET("/getRealtimeHealthMonitoring/:user_id", h.GetRealtimeHealthMonitoring)
-        health.GET("/getDailyHealthSummary/:id", h.GetDailyHealthSummary)
-        health.GET("/getWeeklyHealthSummary/:id", h.GetWeeklyHealthSummary)
+        health.GET("/getDailyHealthSummary/:date", h.GetDailyHealthSummary)
+        health.GET("/getWeeklyHealthSummary/:start_date/:end_date", h.GetWeeklyHealthSummary)
     }
 
     lifestyle := router.Group("/lifestyle")
     {
         lifestyle.POST("/addLifestyleData", h.AddLifeStyleData)
-        lifestyle.GET("/getAllLifestyleData/:user_id", h.GetLifeStyleData)
+        lifestyle.GET("/getAllLifestyleData", h.GetLifeStyleData)
         lifestyle.GET("/getLifestyleById/:id", h.GetLifeStyleDataById)
         lifestyle.PUT("/updateLifestyleData", h.UpdateLifeStyleData)
         lifestyle.DELETE("/deleteLifestyleData/:id", h.DeleteLifeStyleData)

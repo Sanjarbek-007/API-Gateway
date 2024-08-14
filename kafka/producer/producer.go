@@ -32,6 +32,14 @@ func (k *KafkaProducer) Producermessage(topic string, msg []byte) error {
 	})
 }
 
+func (k *KafkaProducer) WriteToNotification(topic string, msg []byte) error {
+	return k.writer.WriteMessages(context.Background(), kafka.Message{
+		Topic: topic,
+		Value: msg,
+	})
+}
+
+
 func (k *KafkaProducer) Close() {
 	k.writer.Close()
 }

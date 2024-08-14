@@ -6,6 +6,7 @@ import (
 	kafka "api-gateway/kafka/producer"
 	"api-gateway/models"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,14 +30,14 @@ func (h *Handler) GenerateHealthRecommendations(c *gin.Context) {
 	var req health.GenerateHealthRecommendationsReq
 	if err := c.BindJSON(&req); err != nil {
 		h.Logger.Error("Invalid request body", "error", err)
-		c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid data"})
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	writerKafka, err := kafka.NewKafkaProducerInit([]string{"localhost:9092"})
+	writerKafka, err := kafka.NewKafkaProducerInit([]string{"kafka:9092"})
 	if err != nil {
 		h.Logger.Error("Error initializing Kafka producer", "error", err)
-		c.JSON(http.StatusInternalServerError, map[string]string{"message": "Server error"})
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 	defer writerKafka.Close()
@@ -44,19 +45,19 @@ func (h *Handler) GenerateHealthRecommendations(c *gin.Context) {
 	msgBytes, err := json.Marshal(&req)
 	if err != nil {
 		h.Logger.Error("Error marshaling request to JSON", "error", err)
-		c.JSON(http.StatusInternalServerError, map[string]string{"message": "Server error"})
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	err = writerKafka.Producermessage("health", msgBytes)
 	if err != nil {
 		h.Logger.Error("Error producing Kafka message", "error", err)
-		c.JSON(http.StatusInternalServerError, map[string]string{"message": "Server error"})
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	h.Logger.Info("GenerateHealthRecommendations finished successfully")
-	c.JSON(http.StatusOK, map[string]string{"message": "Recommendations generated successfully"})
+	c.JSON(http.StatusOK, models.Success{Message: "Health recommendations generated successfully"})
 }
 
 // GetRealtimeHealthMonitoring godoc
@@ -66,18 +67,24 @@ func (h *Handler) GenerateHealthRecommendations(c *gin.Context) {
 // @Tags HealthCheck
 // @Accept       json
 // @Produce      json
-// @Param user_id path string true "User ID"
 // @Success 200 {object} models.GetRealtimeHealthMonitoringRes "Successful operation"
 // @Failure 400 {object} models.Error "Invalid request parameters"
 // @Failure 500 {object} models.Error "Internal server error"
 // @Router /api/health/getRealtimeHealthMonitoring/{user_id} [get]
 func (h *Handler) GetRealtimeHealthMonitoring(ctx *gin.Context) {
-	id := ctx.Param("user_id")
+	userId, exists := ctx.Get("user_id")
+	if !exists {
+		h.Logger.Error("User ID not found in context")
+		ctx.JSON(http.StatusBadRequest, models.Error{Message: "User ID not found in context"})
+		return
+	}
+	id := userId.(string)
+	fmt.Println(id)
 
 	resp, err := h.Health.GetRealtimeHealthMonitoring(ctx, &health.GetRealtimeHealthMonitoringReq{UserId: id})
 	if err != nil {
 		h.Logger.Error("Error getting user profile: ", "error", err)
-		ctx.JSON(500, models.Error{Message: "Internal server error"})
+		ctx.JSON(500, models.Error{Message: err.Error()})
 		return
 	}
 
@@ -91,45 +98,44 @@ func (h *Handler) GetRealtimeHealthMonitoring(ctx *gin.Context) {
 // @Tags HealthCheck
 // @Accept       json
 // @Produce      json
-// @Param        id path string true "User ID"
-// @Param        body body models.GetDailyHealthSummaryReq true "Request body for getting daily health summary"
+// @Param date query string true "Date in format YYYY-MM-DD"
 // @Success 200 {object} health.GetDailyHealthSummaryRes "Successful operation"
 // @Failure 400 {object} models.Error "Invalid request parameters"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /api/health/getDailyHealthSummary/{id} [post]
+// @Router /api/health/getDailyHealthSummary/{date} [get]
 func (h *Handler) GetDailyHealthSummary(ctx *gin.Context) {
-	id := ctx.Param("id")
+	userId, exists := ctx.Get("user_id")
+	if !exists {
+		h.Logger.Error("User ID not found in context")
+		ctx.JSON(http.StatusBadRequest, models.Error{Message: "User ID not found in context"})
+		return
+	}
+	id := userId.(string)
+	fmt.Println(id)
 
 	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
 	if err != nil {
 		h.Logger.Error("Error getting user profile", "error", err)
-		ctx.JSON(http.StatusInternalServerError, models.Error{Message: "Internal server error"})
+		ctx.JSON(http.StatusInternalServerError, models.Error{Message: err.Error()})
 		return
 	}
 
-	var getDailySummary health.GetDailyHealthSummaryReq
-
-	if err := ctx.ShouldBindJSON(&getDailySummary); err != nil {
-		h.Logger.Error("Error binding JSON", "error", err)
-		ctx.JSON(http.StatusBadRequest, models.Error{Message: "Invalid request parameters"})
-		return
-	}
+	date := ctx.Query("date")
 
 	resp, err := h.Health.GetDailyHealthSummary(ctx, &health.GetDailyHealthSummaryReq{
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		UserId:    id,
-		Date:      getDailySummary.Date,
+		Date:      date,
 	})
 	if err != nil {
 		h.Logger.Error("Error getting daily health summary", "error", err)
-		ctx.JSON(http.StatusInternalServerError, models.Error{Message: "Internal server error"})
+		ctx.JSON(http.StatusInternalServerError, models.Error{Message: err.Error()})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, resp)
 }
-
 
 // GetWeeklyHealthSummary godoc
 // @Security ApiKeyAuth
@@ -138,39 +144,42 @@ func (h *Handler) GetDailyHealthSummary(ctx *gin.Context) {
 // @Tags HealthCheck
 // @Accept       json
 // @Produce      json
-// @Param id path string true "User ID"
-// @Param body body health.GetWeeklyHealthSummaryReq true "Request body for weekly health summary"
+// @Param start_date query string true "Date in format YYYY-MM-DD"
+// @Param end_date query string true "Date in format YYYY-MM-DD"
 // @Success 200 {object} health.GetWeeklyHealthSummaryRes "Successful operation"
 // @Failure 400 {object} models.Error "Invalid request parameters"
 // @Failure 500 {object} models.Error "Internal server error"
-// @Router /api/health/weekly/{id} [post]
+// @Router /api/health/getWeeklyHealthSummary/{start_date}/{end_date} [get]
 func (h *Handler) GetWeeklyHealthSummary(ctx *gin.Context) {
-	id := ctx.Param("id")
+	userId, exists := ctx.Get("user_id")
+	if !exists {
+		h.Logger.Error("User ID not found in context")
+		ctx.JSON(http.StatusBadRequest, models.Error{Message: "User ID not found in context"})
+		return
+	}
+	id := userId.(string)
+	fmt.Println(id)
 
 	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
 	if err != nil {
 		h.Logger.Error("Error getting user profile: ", "error", err)
-		ctx.JSON(500, models.Error{Message: "Internal server error"})
+		ctx.JSON(500, models.Error{Message: err.Error()})
 		return
 	}
 
-	var getWeeklySummary health.GetWeeklyHealthSummaryReq
-
-	if err := ctx.ShouldBindJSON(&getWeeklySummary); err != nil {
-		h.Logger.Error("Error binding JSON: ", "error", err)
-		ctx.JSON(400, models.Error{Message: "Invalid request parameters"})
-		return
-	}
+	
+	startdate := ctx.Param("start_date")
+    enddate := ctx.Param("end_date")
 
 	resp, err := h.Health.GetWeeklyHealthSummary(ctx, &health.GetWeeklyHealthSummaryReq{
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		UserId:    id,
-		StartDate: getWeeklySummary.StartDate,
-		EndDate:   getWeeklySummary.EndDate})
+		StartDate: startdate,
+		EndDate:   enddate})
 	if err != nil {
 		h.Logger.Error("Error getting user profile: ", "error", err)
-		ctx.JSON(500, models.Error{Message: "Internal server error"})
+		ctx.JSON(500, models.Error{Message: err.Error()})
 		return
 	}
 
