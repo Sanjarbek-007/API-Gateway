@@ -15,10 +15,9 @@ type Handler struct {
 	Wearable health.WearableClient
 	Logger *slog.Logger
 	Enforcer *casbin.Enforcer
-	Notification     user.NotificationsClient
 }
 
-func NewHandler(user user.UsersClient, healthClient health.HealthCheckClient, lifeStyleClient health.LifeStyleClient, medicalRecordClient health.MedicalRecordClient, wearableClient health.WearableClient, logger *slog.Logger, Enforcer *casbin.Enforcer, Notification user.NotificationsClient) *Handler {
+func NewHandler(user user.UsersClient, healthClient health.HealthCheckClient, lifeStyleClient health.LifeStyleClient, medicalRecordClient health.MedicalRecordClient, wearableClient health.WearableClient, logger *slog.Logger, Enforcer *casbin.Enforcer) *Handler {
 	return &Handler{
         User:         user,
         Health:  healthClient,
@@ -27,6 +26,5 @@ func NewHandler(user user.UsersClient, healthClient health.HealthCheckClient, li
         Wearable: wearableClient,
         Logger:        logger,
 		Enforcer: Enforcer,
-		Notification: Notification,
     }
 }

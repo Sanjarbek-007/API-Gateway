@@ -55,9 +55,19 @@ func (h *Handler) GenerateHealthRecommendations(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
+	message := fmt.Sprintf("Generated health recommendations for user %s Description : %s, Priority : %d, RecommendationType : %s, ", req.UserId, req.Description, req.Priority, req.RecommendationType)
+
+	fmt.Println(req.UserId)
+	resp, err := h.User.CreateNotifications(c, &user.CreateNotificationsReq{UserId: req.UserId, Message: message})
+	if err!= nil {
+        h.Logger.Error("Error creating notifications: ", "error", err)
+        c.JSON(http.StatusInternalServerError, err.Error())
+        return
+    }
+	fmt.Println(resp.Id)
 
 	h.Logger.Info("GenerateHealthRecommendations finished successfully")
-	c.JSON(http.StatusOK, models.Success{Message: "Health recommendations generated successfully"})
+	c.JSON(http.StatusOK, models.Success{Message: "Health recommendations generated successfully ",})
 }
 
 // GetRealtimeHealthMonitoring godoc
@@ -80,6 +90,7 @@ func (h *Handler) GetRealtimeHealthMonitoring(ctx *gin.Context) {
 	}
 	id := userId.(string)
 	fmt.Println(id)
+
 
 	resp, err := h.Health.GetRealtimeHealthMonitoring(ctx, &health.GetRealtimeHealthMonitoringReq{UserId: id})
 	if err != nil {
@@ -111,20 +122,20 @@ func (h *Handler) GetDailyHealthSummary(ctx *gin.Context) {
 		return
 	}
 	id := userId.(string)
-	fmt.Println(id)
-
-	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
-	if err != nil {
-		h.Logger.Error("Error getting user profile", "error", err)
-		ctx.JSON(http.StatusInternalServerError, models.Error{Message: err.Error()})
-		return
-	}
+	
+	// user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
+	// fmt.Println(id)
+	// fmt.Println("Qara")
+	// fmt.Println(user)
+	// if err != nil {
+	// 	h.Logger.Error("Error getting user profile", "error", err)
+	// 	ctx.JSON(http.StatusInternalServerError, models.Error{Message: err.Error()})
+	// 	return
+	// }
 
 	date := ctx.Query("date")
 
 	resp, err := h.Health.GetDailyHealthSummary(ctx, &health.GetDailyHealthSummaryReq{
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
 		UserId:    id,
 		Date:      date,
 	})

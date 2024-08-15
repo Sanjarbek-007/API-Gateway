@@ -772,7 +772,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/notifications": {
+        "/api/v1/notifications/getAll": {
             "get": {
                 "security": [
                     {

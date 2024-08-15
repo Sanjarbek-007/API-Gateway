@@ -88,4 +88,10 @@ func (c *controllerImpl) SetupRoutes(h handler.Handler, logger *slog.Logger) {
         wearable.PUT("/update", h.UpdateWearableData)
         wearable.DELETE("/delete/:id", h.DeleteWearableData)
     }
+
+    notifications := router.Group("/notifications")
+    {
+        notifications.GET("/getAll", h.GetAllNotifications)
+        notifications.GET("/new", h.GetAndMarkNotificationAsRead)
+    }
 }

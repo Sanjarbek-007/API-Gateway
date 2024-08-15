@@ -15,7 +15,6 @@ type ServiceManager interface {
 	LifeStyleService() health.LifeStyleClient
 	MedicalRecordService() health.MedicalRecordClient
 	WearableService() health.WearableClient
-	NotificationService() user.NotificationsClient
 }
 
 type serviceManagerImpl struct {
@@ -24,7 +23,6 @@ type serviceManagerImpl struct {
 	lifeStyleClient health.LifeStyleClient
 	medicalRecordClient health.MedicalRecordClient
 	werableClient health.WearableClient
-	notificationClient user.NotificationsClient
 }
 
 func (s *serviceManagerImpl) UserService() user.UsersClient {
@@ -47,9 +45,6 @@ func (s *serviceManagerImpl) WearableService() health.WearableClient {
     return s.werableClient
 }
 
-func (s *serviceManagerImpl) NotificationService() user.NotificationsClient {
-    return s.notificationClient
-}
 
 func NewServiceManager() (ServiceManager, error) {
 	connUser, err := grpc.Dial(
@@ -74,7 +69,6 @@ func NewServiceManager() (ServiceManager, error) {
 		lifeStyleClient:    health.NewLifeStyleClient(connHealth),
 		medicalRecordClient: health.NewMedicalRecordClient(connHealth),
 		werableClient:      health.NewWearableClient(connHealth),
-		notificationClient: user.NewNotificationsClient(connUser),
 	}, nil
 }
 

@@ -119,19 +119,29 @@ func CasbinEnforcer(logger *slog.Logger) (*casbin.Enforcer, error) {
 
 		//wearable
 		{"admin", "/api/wearable/add", "POST"},
-        {"admin", "/api/get/get", "GET"},
+        {"admin", "/api/wearable/get", "GET"},
         {"admin", "/api/wearable/getById/:id", "GET"},
         {"admin", "/api/wearable/update", "PUT"},
         {"admin", "/api/wearable/delete/:id", "DELETE"},
 
 		{"patient", "/api/wearable/add", "POST"},
-        {"patient", "/api/get/get", "GET"},
+        {"patient", "/api/wearable/get", "GET"},
 
 		{"doctor", "/api/wearable/add", "POST"},
         {"doctor", "/api/wearable/get", "GET"},
         {"doctor", "/api/wearable/getById/:id", "GET"},
         {"doctor", "/api/wearable/update", "PUT"},
         {"doctor", "/api/wearable/delete/:id", "DELETE"},
+
+		// notification
+		{"admin", "/api/notifications/getAll", "GET"},
+		{"admin", "/api/notifications/new", "GET"},
+
+		{"patient", "/api/notifications/getAll", "GET"},
+        {"patient", "/api/notifications/new", "GET"},
+
+		{"doctor", "/api/notifications/getAll", "GET"},
+        {"doctor", "/api/notifications/new", "GET"},
 	}
 
 	_, err = enforcer.AddPolicies(policies)

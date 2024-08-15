@@ -19,17 +19,20 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	Users_Register_FullMethodName       = "/user.Users/Register"
-	Users_Login_FullMethodName          = "/user.Users/Login"
-	Users_GetUserProfile_FullMethodName = "/user.Users/GetUserProfile"
-	Users_UpdateProfile_FullMethodName  = "/user.Users/UpdateProfile"
-	Users_GetUSerByEmail_FullMethodName = "/user.Users/GetUSerByEmail"
-	Users_GetUsers_FullMethodName       = "/user.Users/GetUsers"
-	Users_UpdateUser_FullMethodName     = "/user.Users/UpdateUser"
-	Users_DeleteUser_FullMethodName     = "/user.Users/DeleteUser"
-	Users_GetUserById_FullMethodName    = "/user.Users/GetUserById"
-	Users_UpdatePassword_FullMethodName = "/user.Users/UpdatePassword"
-	Users_ChangePassword_FullMethodName = "/user.Users/ChangePassword"
+	Users_Register_FullMethodName                     = "/user.Users/Register"
+	Users_Login_FullMethodName                        = "/user.Users/Login"
+	Users_GetUserProfile_FullMethodName               = "/user.Users/GetUserProfile"
+	Users_UpdateProfile_FullMethodName                = "/user.Users/UpdateProfile"
+	Users_GetUSerByEmail_FullMethodName               = "/user.Users/GetUSerByEmail"
+	Users_GetUsers_FullMethodName                     = "/user.Users/GetUsers"
+	Users_UpdateUser_FullMethodName                   = "/user.Users/UpdateUser"
+	Users_DeleteUser_FullMethodName                   = "/user.Users/DeleteUser"
+	Users_GetUserById_FullMethodName                  = "/user.Users/GetUserById"
+	Users_UpdatePassword_FullMethodName               = "/user.Users/UpdatePassword"
+	Users_ChangePassword_FullMethodName               = "/user.Users/ChangePassword"
+	Users_GetAllNotifications_FullMethodName          = "/user.Users/GetAllNotifications"
+	Users_GetAndMarkNotificationAsRead_FullMethodName = "/user.Users/GetAndMarkNotificationAsRead"
+	Users_CreateNotifications_FullMethodName          = "/user.Users/CreateNotifications"
 )
 
 // UsersClient is the client API for Users service.
@@ -47,6 +50,9 @@ type UsersClient interface {
 	GetUserById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error)
 	UpdatePassword(ctx context.Context, in *UpdatePasswordReq, opts ...grpc.CallOption) (*Void, error)
 	ChangePassword(ctx context.Context, in *ChangePasswordReq, opts ...grpc.CallOption) (*ChangePasswordRes, error)
+	GetAllNotifications(ctx context.Context, in *GetNotificationsReq, opts ...grpc.CallOption) (*GetNotificationsResponse, error)
+	GetAndMarkNotificationAsRead(ctx context.Context, in *GetAndMarkNotificationAsReadReq, opts ...grpc.CallOption) (*GetAndMarkNotificationAsReadRes, error)
+	CreateNotifications(ctx context.Context, in *CreateNotificationsReq, opts ...grpc.CallOption) (*CreateNotificationsRes, error)
 }
 
 type usersClient struct {
@@ -167,6 +173,36 @@ func (c *usersClient) ChangePassword(ctx context.Context, in *ChangePasswordReq,
 	return out, nil
 }
 
+func (c *usersClient) GetAllNotifications(ctx context.Context, in *GetNotificationsReq, opts ...grpc.CallOption) (*GetNotificationsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetNotificationsResponse)
+	err := c.cc.Invoke(ctx, Users_GetAllNotifications_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersClient) GetAndMarkNotificationAsRead(ctx context.Context, in *GetAndMarkNotificationAsReadReq, opts ...grpc.CallOption) (*GetAndMarkNotificationAsReadRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAndMarkNotificationAsReadRes)
+	err := c.cc.Invoke(ctx, Users_GetAndMarkNotificationAsRead_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersClient) CreateNotifications(ctx context.Context, in *CreateNotificationsReq, opts ...grpc.CallOption) (*CreateNotificationsRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateNotificationsRes)
+	err := c.cc.Invoke(ctx, Users_CreateNotifications_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UsersServer is the server API for Users service.
 // All implementations must embed UnimplementedUsersServer
 // for forward compatibility
@@ -182,6 +218,9 @@ type UsersServer interface {
 	GetUserById(context.Context, *UserId) (*User, error)
 	UpdatePassword(context.Context, *UpdatePasswordReq) (*Void, error)
 	ChangePassword(context.Context, *ChangePasswordReq) (*ChangePasswordRes, error)
+	GetAllNotifications(context.Context, *GetNotificationsReq) (*GetNotificationsResponse, error)
+	GetAndMarkNotificationAsRead(context.Context, *GetAndMarkNotificationAsReadReq) (*GetAndMarkNotificationAsReadRes, error)
+	CreateNotifications(context.Context, *CreateNotificationsReq) (*CreateNotificationsRes, error)
 	mustEmbedUnimplementedUsersServer()
 }
 
@@ -221,6 +260,15 @@ func (UnimplementedUsersServer) UpdatePassword(context.Context, *UpdatePasswordR
 }
 func (UnimplementedUsersServer) ChangePassword(context.Context, *ChangePasswordReq) (*ChangePasswordRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangePassword not implemented")
+}
+func (UnimplementedUsersServer) GetAllNotifications(context.Context, *GetNotificationsReq) (*GetNotificationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllNotifications not implemented")
+}
+func (UnimplementedUsersServer) GetAndMarkNotificationAsRead(context.Context, *GetAndMarkNotificationAsReadReq) (*GetAndMarkNotificationAsReadRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAndMarkNotificationAsRead not implemented")
+}
+func (UnimplementedUsersServer) CreateNotifications(context.Context, *CreateNotificationsReq) (*CreateNotificationsRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateNotifications not implemented")
 }
 func (UnimplementedUsersServer) mustEmbedUnimplementedUsersServer() {}
 
@@ -433,6 +481,60 @@ func _Users_ChangePassword_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Users_GetAllNotifications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNotificationsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServer).GetAllNotifications(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Users_GetAllNotifications_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServer).GetAllNotifications(ctx, req.(*GetNotificationsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Users_GetAndMarkNotificationAsRead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAndMarkNotificationAsReadReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServer).GetAndMarkNotificationAsRead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Users_GetAndMarkNotificationAsRead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServer).GetAndMarkNotificationAsRead(ctx, req.(*GetAndMarkNotificationAsReadReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Users_CreateNotifications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateNotificationsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServer).CreateNotifications(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Users_CreateNotifications_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServer).CreateNotifications(ctx, req.(*CreateNotificationsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Users_ServiceDesc is the grpc.ServiceDesc for Users service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -484,134 +586,17 @@ var Users_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "ChangePassword",
 			Handler:    _Users_ChangePassword_Handler,
 		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "user.proto",
-}
-
-const (
-	Notifications_GetAllNotifications_FullMethodName          = "/user.Notifications/GetAllNotifications"
-	Notifications_GetAndMarkNotificationAsRead_FullMethodName = "/user.Notifications/GetAndMarkNotificationAsRead"
-)
-
-// NotificationsClient is the client API for Notifications service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type NotificationsClient interface {
-	GetAllNotifications(ctx context.Context, in *GetNotificationsReq, opts ...grpc.CallOption) (*GetNotificationsResponse, error)
-	GetAndMarkNotificationAsRead(ctx context.Context, in *GetAndMarkNotificationAsReadReq, opts ...grpc.CallOption) (*GetAndMarkNotificationAsReadRes, error)
-}
-
-type notificationsClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewNotificationsClient(cc grpc.ClientConnInterface) NotificationsClient {
-	return &notificationsClient{cc}
-}
-
-func (c *notificationsClient) GetAllNotifications(ctx context.Context, in *GetNotificationsReq, opts ...grpc.CallOption) (*GetNotificationsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetNotificationsResponse)
-	err := c.cc.Invoke(ctx, Notifications_GetAllNotifications_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *notificationsClient) GetAndMarkNotificationAsRead(ctx context.Context, in *GetAndMarkNotificationAsReadReq, opts ...grpc.CallOption) (*GetAndMarkNotificationAsReadRes, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetAndMarkNotificationAsReadRes)
-	err := c.cc.Invoke(ctx, Notifications_GetAndMarkNotificationAsRead_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// NotificationsServer is the server API for Notifications service.
-// All implementations must embed UnimplementedNotificationsServer
-// for forward compatibility
-type NotificationsServer interface {
-	GetAllNotifications(context.Context, *GetNotificationsReq) (*GetNotificationsResponse, error)
-	GetAndMarkNotificationAsRead(context.Context, *GetAndMarkNotificationAsReadReq) (*GetAndMarkNotificationAsReadRes, error)
-	mustEmbedUnimplementedNotificationsServer()
-}
-
-// UnimplementedNotificationsServer must be embedded to have forward compatible implementations.
-type UnimplementedNotificationsServer struct {
-}
-
-func (UnimplementedNotificationsServer) GetAllNotifications(context.Context, *GetNotificationsReq) (*GetNotificationsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAllNotifications not implemented")
-}
-func (UnimplementedNotificationsServer) GetAndMarkNotificationAsRead(context.Context, *GetAndMarkNotificationAsReadReq) (*GetAndMarkNotificationAsReadRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAndMarkNotificationAsRead not implemented")
-}
-func (UnimplementedNotificationsServer) mustEmbedUnimplementedNotificationsServer() {}
-
-// UnsafeNotificationsServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to NotificationsServer will
-// result in compilation errors.
-type UnsafeNotificationsServer interface {
-	mustEmbedUnimplementedNotificationsServer()
-}
-
-func RegisterNotificationsServer(s grpc.ServiceRegistrar, srv NotificationsServer) {
-	s.RegisterService(&Notifications_ServiceDesc, srv)
-}
-
-func _Notifications_GetAllNotifications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetNotificationsReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NotificationsServer).GetAllNotifications(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Notifications_GetAllNotifications_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotificationsServer).GetAllNotifications(ctx, req.(*GetNotificationsReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Notifications_GetAndMarkNotificationAsRead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAndMarkNotificationAsReadReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NotificationsServer).GetAndMarkNotificationAsRead(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Notifications_GetAndMarkNotificationAsRead_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotificationsServer).GetAndMarkNotificationAsRead(ctx, req.(*GetAndMarkNotificationAsReadReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// Notifications_ServiceDesc is the grpc.ServiceDesc for Notifications service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var Notifications_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "user.Notifications",
-	HandlerType: (*NotificationsServer)(nil),
-	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetAllNotifications",
-			Handler:    _Notifications_GetAllNotifications_Handler,
+			Handler:    _Users_GetAllNotifications_Handler,
 		},
 		{
 			MethodName: "GetAndMarkNotificationAsRead",
-			Handler:    _Notifications_GetAndMarkNotificationAsRead_Handler,
+			Handler:    _Users_GetAndMarkNotificationAsRead_Handler,
+		},
+		{
+			MethodName: "CreateNotifications",
+			Handler:    _Users_CreateNotifications_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

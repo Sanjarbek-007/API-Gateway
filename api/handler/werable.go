@@ -2,7 +2,6 @@ package handler
 
 import (
 	"api-gateway/genproto/health"
-	"api-gateway/genproto/user"
 	kafka "api-gateway/kafka/producer"
 	"api-gateway/models"
 	"encoding/json"
@@ -40,7 +39,7 @@ func (h *Handler) AddWearableData(ctx *gin.Context) {
 		return
 	}
 
-	warable.UserId=id
+	warable.UserId = id
 
 	writerKafka, err := kafka.NewKafkaProducerInit([]string{"kafka:9092"})
 	if err != nil {
@@ -57,7 +56,7 @@ func (h *Handler) AddWearableData(ctx *gin.Context) {
 		return
 	}
 
-	err = writerKafka.Producermessage("health", msgBytes)
+	err = writerKafka.Producermessage("werable", msgBytes)
 	if err != nil {
 		h.Logger.Error("Error producing Kafka message", "error", err)
 		ctx.JSON(http.StatusInternalServerError, models.Error{Message: err.Error()})
@@ -88,15 +87,15 @@ func (h *Handler) GetWearableData(ctx *gin.Context) {
 	id := userID.(string)
 	fmt.Println(id)
 
-	user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
-	if err != nil {
-		fmt.Println(err, "------------------------")
-		h.Logger.Error("Error getting user profile: ", "error", err)
-		ctx.JSON(500, models.Error{Message: err.Error()})
-		return
-	}
-	fmt.Println(user.FirstName, user.LastName)
-	resp, err := h.Wearable.GetWearableData(ctx, &health.GetWearableDataReq{UserId: id, FirstName: user.FirstName, LastName: user.LastName})
+	// user, err := h.User.GetUserById(ctx, &user.UserId{UserId: id})
+	// if err != nil {
+	// 	fmt.Println(err, "------------------------")
+	// 	h.Logger.Error("Error getting user profile: ", "error", err)
+	// 	ctx.JSON(500, models.Error{Message: err.Error()})
+	// 	return
+	// }
+	// fmt.Println(user.FirstName, user.LastName)
+	resp, err := h.Wearable.GetWearableData(ctx, &health.GetWearableDataReq{UserId: id})
 	if err != nil {
 		fmt.Println(err, "+++++++++++++++++++++++++++++++++++")
 		h.Logger.Error("Error Get Medical record Style: ", "error", err)

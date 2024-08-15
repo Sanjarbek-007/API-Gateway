@@ -33,7 +33,7 @@ func main() {
 	}
 
 
-	handler := handler.NewHandler(serviceManager.UserService(), serviceManager.HealthSerivce(), serviceManager.LifeStyleService(),serviceManager.MedicalRecordService(), serviceManager.WearableService(), logger, enforcer, serviceManager.NotificationService())
+	handler := handler.NewHandler(serviceManager.UserService(), serviceManager.HealthSerivce(), serviceManager.LifeStyleService(),serviceManager.MedicalRecordService(), serviceManager.WearableService(), logger, enforcer)
 	controller := api.NewController(gin.Default())
 	controller.SetupRoutes(*handler, logger)
 	controller.StartServer(config)

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	tokenn "api-gateway/api/token"
 	"api-gateway/genproto/user"
 	"net/http"
 
@@ -16,18 +15,21 @@ import (
 // @Success 200 {object} user.GetNotificationsResponse
 // @Failure 400 {object} string "Invalid data"
 // @Failure 500 {object} string "Server error"
-// @Router /api/v1/notifications [get]
+// @Router /api/v1/notifications/getAll [get]
 func (h *Handler) GetAllNotifications(c *gin.Context) {
 	h.Logger.Info("GetAllNotifications called")
 	req := user.GetNotificationsReq{}
-	accessToken := c.GetHeader("Authorization")
-	id, _, err := tokenn.GetUserInfoFromAccessToken(accessToken)
-	if err != nil {
-		h.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+	userId, exists := c.Get("userId")
+	if !exists {
+		h.Logger.Error("User ID not found in context")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID not found in context"})
+		return
 	}
+
+	id := userId.(string)
 	req.UserId = id
-	res, err := h.Notification.GetAllNotifications(c, &req)
+	res, err := h.User.GetAllNotifications(c, &req)
 	if err != nil {
 		h.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
@@ -51,16 +53,16 @@ func (h *Handler) GetAndMarkNotificationAsRead(c *gin.Context) {
 
 	req := user.GetAndMarkNotificationAsReadReq{}
 
-	accessToken := c.GetHeader("Authorization")
-	
-	id, _, err := tokenn.GetUserInfoFromAccessToken(accessToken)
-	if err != nil {
-		h.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	userId, exists := c.Get("userId")
+	if !exists {
+		h.Logger.Error("User ID not found in context")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID not found in context"})
 		return
 	}
+	id := userId.(string)
+
 	req.UserId = id
-	res, err := h.Notification.GetAndMarkNotificationAsRead(c, &req)
+	res, err := h.User.GetAndMarkNotificationAsRead(c, &req)
 	if err != nil {
 		h.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error"})

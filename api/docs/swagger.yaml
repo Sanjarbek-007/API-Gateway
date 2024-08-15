@@ -803,7 +803,7 @@ paths:
       summary: Update user profile
       tags:
       - User
-  /api/v1/notifications:
+  /api/v1/notifications/getAll:
     get:
       description: it will GetAllNotifications
       responses:
