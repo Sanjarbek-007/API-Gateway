@@ -6,7 +6,7 @@ services:
     container_name: postgres_container
     environment:
       - POSTGRES_USER=macbookpro
-      - POSTGRES_PASSWORD=1111
+      - POSTGRES_PASSWORD=1111   
       - POSTGRES_DB=casbin
     networks:
       - health
@@ -30,7 +30,7 @@ services:
       - "22181:2181"
     networks:
       - health
- 
+
   kafka:
     image: confluentinc/cp-kafka:7.4.4
     container_name: kafka
