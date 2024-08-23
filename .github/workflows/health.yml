@@ -36,10 +36,9 @@ jobs:
             git pull
             docker compose down
             docker compose up -d
-            cd ..
-            cd Health-auth-service/
+            cd ../Health-auth-service/
             docker compose down
             docker compose up -d
-            cd ..
-            cd Health-Analytics-service/
-            Health-Analytics-service/
+            cd ../Health-Analytics-service/
+            docker compose down
+            docker compose up -d
